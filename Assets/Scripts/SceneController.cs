@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor.SearchService;
@@ -12,9 +13,11 @@ public class SceneController : MonoBehaviour
         SceneManager.LoadScene(0, LoadSceneMode.Single);
     }
 
-    public void OpenGameScene()
+    public void OpenGameScene(int index)
     {
+        if (index == 0) OpenMainScene();
+
         // Аддитивно загружаем игровую сцену
-        SceneManager.LoadScene(1, LoadSceneMode.Additive);
+        SceneManager.LoadScene(index, LoadSceneMode.Additive);
     }
 }
