@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 
 public class SceneController : MonoBehaviour
 {
-    public void OpenMainScene()
+    private void OpenMainScene()
     {
         // Выгружаем все сцены кроме основной (если нужно)
         SceneManager.LoadScene(0, LoadSceneMode.Single);
