@@ -1,0 +1,34 @@
+{
+    "name": "GameImput",
+    "maps": [
+        {
+            "name": "Game",
+            "id": "4aff0585-8b89-4e8e-8592-cea52e81c9ad",
+            "actions": [
+                {
+                    "name": "Restart",
+                    "type": "Button",
+                    "id": "fae20beb-dbf7-4a8e-be4f-1dc06dd3a749",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "a45a3a8d-5493-41d1-93be-59cb37282c32",
+                    "path": "<Keyboard>/tab",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Restart",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}

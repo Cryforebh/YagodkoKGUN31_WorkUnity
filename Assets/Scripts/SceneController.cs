@@ -20,4 +20,9 @@ public class SceneController : MonoBehaviour
         // Аддитивно загружаем игровую сцену
         SceneManager.LoadScene(index, LoadSceneMode.Additive);
     }
+
+    public void RestartScene()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
 }
