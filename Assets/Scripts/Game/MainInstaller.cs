@@ -4,12 +4,12 @@ using System.ComponentModel;
 using UnityEngine;
 using Zenject;
 
-
 public class MainInstaller : MonoInstaller
 {
     [SerializeField] private SceneController _sceneController;
     [SerializeField] private LevelRestartPanel _restartPanel;
-    [SerializeField] private InputManager _inputManager;
+    [SerializeField] private InputLevelManager _inputManager;
+    [SerializeField] private ContainerStatusGame _containerStatusGame;
 
     public override void InstallBindings()
     {
@@ -19,6 +19,7 @@ public class MainInstaller : MonoInstaller
             .AsSingle();
 
         Container.Bind<LevelRestartPanel>().FromInstance(_restartPanel).AsSingle();
-        Container.Bind<InputManager>().FromInstance(_inputManager).AsSingle();
+        Container.Bind<InputLevelManager>().FromInstance(_inputManager).AsSingle();
+        Container.Bind<ContainerStatusGame>().FromInstance(_containerStatusGame).AsSingle();
     }
 }

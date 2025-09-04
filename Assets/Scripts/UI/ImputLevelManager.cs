@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Zenject;
 
-public class InputManager : MonoBehaviour
+public class InputLevelManager : MonoBehaviour
 {
     [Inject] private LevelRestartPanel _restartPanel;
     [Inject] private SceneController _sceneController;
