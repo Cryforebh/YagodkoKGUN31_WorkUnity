@@ -10,6 +10,7 @@ public class MainInstaller : MonoInstaller
     [SerializeField] private LevelRestartPanel _restartPanel;
     [SerializeField] private InputLevelManager _inputManager;
     [SerializeField] private ContainerStatusGame _containerStatusGame;
+    [SerializeField] private MoveSystem _moveSystem;
 
     public override void InstallBindings()
     {
@@ -20,6 +21,7 @@ public class MainInstaller : MonoInstaller
 
         Container.Bind<LevelRestartPanel>().FromInstance(_restartPanel).AsSingle();
         Container.Bind<InputLevelManager>().FromInstance(_inputManager).AsSingle();
-        Container.Bind<ContainerStatusGame>().FromInstance(_containerStatusGame).AsSingle();
+        Container.Bind<ContainerStatusGame>().FromInstance(_containerStatusGame).AsSingle().NonLazy();
+        Container.Bind<MoveSystem>().FromInstance(_moveSystem).AsSingle().NonLazy();
     }
 }

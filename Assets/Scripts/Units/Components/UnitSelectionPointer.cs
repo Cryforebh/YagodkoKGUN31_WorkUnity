@@ -1,61 +1,147 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using Zenject;
 
+[RequireComponent(typeof(Unit))]
 public class UnitSelectionPointer : MonoBehaviour, IPointerEnterHandler, IPointerClickHandler, IPointerExitHandler
 {
     [Inject] private ContainerStatusGame _statusGame;
-    [Inject] private SelectionManager _selectionPointerColors;
+    [Inject] private SelectionMaterialManager _selectionPointerColors;
+    [Inject] private MoveSystem _moveSystem;
+    [Inject] private AllPlayer _allPlayer;
+    [Inject] private PlayerManager _playerManager;
 
     private static UnitSelectionPointer _currentSelectedUnit; // Статическая ссылка на выбранный юнит
 
+    private Unit _unit;
     private Material _oldMaterial;
     private MeshRenderer _meshRenderer;
     private bool _selected = false;
 
     private void Awake()
     {
+        // Добавляем проверки
+        if (_statusGame == null && _selectionPointerColors == null && _moveSystem == null)
+        {
+            _statusGame = FindObjectOfType<ContainerStatusGame>();
+            _selectionPointerColors = FindObjectOfType<SelectionMaterialManager>();
+            _moveSystem = FindObjectOfType<MoveSystem>();
+            _allPlayer = FindObjectOfType<AllPlayer>();
+            _playerManager = FindObjectOfType<PlayerManager>();
+        }
+
+        if (_statusGame == null)
+        {
+            Debug.LogError($"ContainerStatusGame не инжектирован в {gameObject.name}", this);
+            enabled = false;
+            return;
+        }
+
+        _unit = GetComponent<Unit>();
         _meshRenderer = GetComponent<MeshRenderer>();
         _oldMaterial = _meshRenderer.material;
 
+        if (_statusGame == null) Debug.Log("! Статуса еще не существует !");
+
         // Подписываемся на событие "изменения стадии игры"
+        _statusGame.OnStatusChanged += TransferSelect;
         _statusGame.OnStatusChanged += OnGameStatusChanged;
+
+        if (_unit == null)
+        {
+            Debug.LogError($"Unit не найден на {gameObject.name}", this);
+        }
     }
 
     private void OnDestroy()
     {
-        // Важно: отписываемся при уничтожении
+        _statusGame.OnStatusChanged -= TransferSelect;
         _statusGame.OnStatusChanged -= OnGameStatusChanged;
     }
 
     private void OnGameStatusChanged(EnumStatusGame newStatus)
     {
+        if (newStatus == EnumStatusGame.Hit)
+        {
+            //_moveSystem.SetUnitAction(_unit);
+            Debug.Log("Данные о Вражеском Персонаже переданы...");
+            Deselect(); // Автоматическое снятие выбора
+        }
         if (newStatus >= EnumStatusGame.SelectedCell && _selected)
         {
+            _moveSystem.SetUnitAction(_unit);
+            //// Через Событие статуса игры, передаем выбранного персонажа на стадии выбора действия
+            //_moveSystem.SetUnitAction(_unit);
+            Debug.Log("Персонаж отвязан - была выбрана клетка.");
             Deselect(); // Автоматическое снятие выбора
+        }
+    }
+
+    private void TransferSelect(EnumStatusGame newStatus)
+    {
+        if (newStatus == EnumStatusGame.SelectedUnit && _selected)
+        {
+            // Через Событие статуса игры, передаем нашего выбранного персонажа на стадии выбора персонажа
+            _moveSystem.SetUnitSelected(_unit);
+            Debug.Log("Данные о Персонаже переданы...");
         }
     }
 
     private void Focus()
     {
+        if (!_selectionPointerColors) return;
+
+        //if (_unit.GetStatusUnit == EnumStatusUnit.Enemy) return;
+
         if (!_selected && _statusGame.Status < EnumStatusGame.SelectedCell) // Фокус только для невыбранных юнитов
         {
             _meshRenderer.material = _selectionPointerColors.GetFocusMaterialUnit;
+        }
+
+        if (_unit.GetStatusUnit == EnumStatusUnit.Enemy)
+        {
+            _meshRenderer.material = _selectionPointerColors.GetFocusMaterialEnemyUnit;
         }
     }
 
     private void Select()
     {
+        //// 1. Проверка текущего состояния игры
+        //if (_statusGame.Status >= EnumStatusGame.SelectedCell)
+        //    return;
+
+        //// 2. Обработка выбора вражеского юнита
+        //if (_unit.GetStatusUnit == EnumStatusUnit.Enemy)
+        //{
+        //    HandleEnemySelection();
+        //    return;
+        //}
+
+
+
         if (_statusGame.Status >= EnumStatusGame.SelectedCell) return;
 
-        // Если кликнули на новый юнит
-        if (!_selected)
+        // ВЫбор вражеского юнита на стадии выбора персонажа
+        if (_unit.GetStatusUnit == EnumStatusUnit.Enemy && _statusGame.Status == EnumStatusGame.SelectedUnit)
+        {
+            _statusGame.StatusUpdate(EnumStatusGame.Hit);
+        }
+        else if (_unit.GetStatusUnit == EnumStatusUnit.Enemy && _statusGame.Status == EnumStatusGame.SelectedCell)
+        {
+            _currentSelectedUnit?.Deselect();
+        }
+        else if (_unit.GetStatusUnit == EnumStatusUnit.Enemy && _statusGame.Status < EnumStatusGame.SelectedUnit) return;
+
+        // Если кликнули на свой новый юнит
+        if (!_selected && _unit.GetStatusUnit != EnumStatusUnit.Enemy)
         {
             // Снимаем выбор с предыдущего юнита
             _currentSelectedUnit?.Deselect();
 
             // Выбираем текущий
             _selected = true;
+
             _statusGame.StatusUpdate(EnumStatusGame.SelectedUnit);
             _meshRenderer.material = _selectionPointerColors.GetSelectMaterialUnit;
             _currentSelectedUnit = this;
@@ -70,7 +156,7 @@ public class UnitSelectionPointer : MonoBehaviour, IPointerEnterHandler, IPointe
     private void Deselect()
     {
         // Если это новый юнит
-        if (!_selected) return; 
+        if (!_selected) return;
 
         _selected = false;
 
@@ -102,6 +188,11 @@ public class UnitSelectionPointer : MonoBehaviour, IPointerEnterHandler, IPointe
 
     public void OnPointerExit(PointerEventData eventData) => Exit();
 
+    public bool Selected()
+    {
+        if (_currentSelectedUnit == this && _selected) return true;
+        else return false;
+    }
 }
 
 

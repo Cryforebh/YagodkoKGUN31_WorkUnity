@@ -4,10 +4,12 @@ using UnityEngine;
 
 public enum EnumStatusGame
 {
-    Empty,
-    SelectedUnit,
-    SelectedSpell,
-    SelectedCell
+    Empty = 0,
+    SelectedUnit = 1,
+    SelectedSpell = 2,
+    SelectedCell = 3,
+    Hit = 4,
+
 }
 
 //public enum EnumStatusGameCell
