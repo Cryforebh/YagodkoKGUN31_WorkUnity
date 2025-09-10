@@ -11,7 +11,7 @@ public class AllPlayer : MonoBehaviour
     {
         if (!_playersCollection.ContainsKey(playerEnum))
         {
-            Debug.LogWarning($"Внимание: Был создан новый список Unit'тов для {playerEnum}!");
+            //Debug.Log($"Внимание: Был создан новый список Unit'тов для {playerEnum}!");
             _playersCollection[playerEnum] = new List<Unit>();
         }
         _playersCollection[playerEnum].Add(unit);

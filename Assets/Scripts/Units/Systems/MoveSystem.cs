@@ -3,90 +3,138 @@ using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
 
-//[RequireComponent(typeof(UnitSelectionPointer)), RequireComponent(typeof(Unit)), RequireComponent(typeof(Cell))]
 public class MoveSystem : MonoBehaviour
 {
     [Inject] private ContainerStatusGame _statusGame;
     [Inject] private AllCell _allCell;
     [Inject] private PlayerManager _playerManager;
 
-    private Cell _cell;
-    private Cell _oldCell;
-    private Unit _unit;
-    private Unit _currentUnitAction;
-    private bool _select;  
+    //[SerializeField] private Camera _cameraMain;
+    [SerializeField] private GameObject _cameraOne;
+    [SerializeField] private GameObject _cameraTwo;
+
+    private Cell _targetCell;
+    private Unit _selectedUnit;
+    private Unit _actionTargetUnit;
 
     private void Awake()
     {
-        _statusGame.OnStatusChanged += _statusGame_OnStatusChanged;
+        _statusGame.OnStatusChanged += HandleStatusChange;
+        _playerManager.OnWinnerDeclared += HandleGameEnd;
     }
 
     private void OnDestroy()
     {
-        _statusGame.OnStatusChanged -= _statusGame_OnStatusChanged;
+        _statusGame.OnStatusChanged -= HandleStatusChange;
+        _playerManager.OnWinnerDeclared -= HandleGameEnd;
     }
 
-    private void _statusGame_OnStatusChanged(EnumStatusGame obj)
+    private void HandleStatusChange(EnumStatusGame status)
     {
-        if ( obj == EnumStatusGame.SelectedCell)
-        {
-            Debug.Log("Данные собраны!");
-            Moved();
-        }
-        if ( obj == EnumStatusGame.Hit)
-        {
-            //Debug.Log("Данные собраны!");
-            //Debug.Log("Удар по вражескому юниту!");
-            Fight();
-        }
-
-
+        if (status == EnumStatusGame.SelectedCell) HandleMovement();
+        else if (status == EnumStatusGame.Hit) HandleCombat();
     }
 
-    public void SetSelect(bool select) {  _select = select; }
-    public void SetUnitSelected(Unit unit) {  _unit = unit; }
-    public void SetUnitAction(Unit unit) { _currentUnitAction = unit; }
-    public void SetCell(Cell cell) { _cell = cell; }
+    public void SetTargetCell(Cell cell) => _targetCell = cell;
+    public void SetSelectedUnit(Unit unit) => _selectedUnit = unit;
+    public void SetActionTarget(Unit unit) => _actionTargetUnit = unit;
 
-    private void Moved()
+    private void HandleMovement()
     {
-        _unit.transform.position = _cell.transform.position + Vector3.up * 2;
-        Debug.Log($"Персонаж {_unit.gameObject.name} перемещен...");
-
-        foreach (var cell in _allCell.Cells)
+        if (_selectedUnit == null || _targetCell == null)
         {
-            if (cell.CurrentUnit == _unit) _oldCell = cell;
+            Debug.LogError("Не выбраны юнит или клетка!");
+            return;
         }
 
-        _cell.SetUnit(_unit);
-        Debug.Log($"Клетка {_cell.gameObject.name} сохранила данные о Персонаже {_unit.gameObject.name}...");
+        // Перемещение
+        _selectedUnit.transform.position = _targetCell.transform.position + Vector3.up * 2;
 
-        if (_oldCell)
-        {
-            _oldCell.ClearUnit();
-            Debug.Log($"Клетка {_oldCell.gameObject.name} удалила данные о Персонаже {_unit.gameObject.name}...");
-        }
-        else if (!_oldCell) { Debug.Log($"В предыдущую клетку небыло добавлено {_unit.gameObject.name}!!!"); }
+        // Обновление данных клеток
+        UpdateCellOwnership(_selectedUnit, _targetCell);
 
-        // Явное обновление статуса (опционально)
-        _unit.SetStatusUnit(_unit.Player == _playerManager.ActivePlayer
-            ? EnumStatusUnit.My
-            : EnumStatusUnit.Enemy);
+        SelectPlayer();
 
-        // !!!!!!  Для тестов возвращает стадию к нулю !!!!!!!
         _statusGame.StatusUpdate(EnumStatusGame.Empty);
     }
 
-    private void Fight()
+    private void UpdateCellOwnership(Unit unit, Cell newCell)
     {
-        if (_currentUnitAction.GetStatusUnit == EnumStatusUnit.Enemy)
+        // Поиск старой клетки
+        Cell oldCell = null;
+        foreach (var cell in _allCell.Cells)
         {
-            // Логика атаки вражеского юнита
-            Debug.Log($"Атакуем врага: {_unit.name}");
+            if (cell.CurrentUnit == unit)
+            {
+                oldCell = cell;
+                break;
+            }
+        }
+
+        if (oldCell != null) oldCell.ClearUnit();
+        newCell.SetUnit(unit);
+    }
+
+    private void HandleCombat()
+    {
+        if (_actionTargetUnit == null)
+        {
+            Debug.LogError("Цель для атаки не установлена!");
+            return;
+        }
+
+        if (_actionTargetUnit.GetStatusUnit == EnumStatusUnit.Enemy)
+        {
+            // Логика урона
+
+            _actionTargetUnit.HitDamageHealth(_selectedUnit.GetDamage);
+            Debug.Log($"Нанесен урон юниту {_actionTargetUnit.name}: {_actionTargetUnit.GetPastDamage} урона, осталось {_actionTargetUnit.GetHealth} HP.");
+
+            if (_actionTargetUnit.IsDead)
+            {
+                _allCell.GetCellOnUnit(_actionTargetUnit).ClearUnit();
+                Debug.Log($"{_actionTargetUnit.name} - Пал в бою!");
+            }
+
+            // Сюда добавить определение победителя если остался единственный игрок с юнитами.
+            _playerManager.CheckWinner();
+
+            SelectPlayer();
+
+            _statusGame.StatusUpdate(EnumStatusGame.Empty);
         }
         else
         {
-            Debug.Log("Нельзя атаковать своего юнита!");
+            Debug.Log("Ошибка: цель не является врагом");
+        }
+    }
+
+    private void HandleGameEnd(EnumPlayers winner)
+    {
+        if (winner == EnumPlayers.None)
+        {
+            Debug.Log("Игра окончена. Нет победителя!");
+        }
+        else
+        {
+            Debug.LogWarning($"ИГРА ОКОНЧЕНА! ПОБЕДИТЕЛЬ: {winner}");
+            // Остановка игры, показ UI и т.д.
+        }
+    }
+
+    private void SelectPlayer()
+    {
+        if (_playerManager.ActivePlayer == EnumPlayers.PlayerTwo)
+        {
+            //_cameraOne.SetActive(true);
+            //_cameraTwo.SetActive(false);
+            _playerManager.ActivePlayer = EnumPlayers.PlayerOne;
+        }
+        else if (_playerManager.ActivePlayer == EnumPlayers.PlayerOne)
+        {
+            //_cameraOne.SetActive(false);
+            //_cameraTwo.SetActive(true);
+            _playerManager.ActivePlayer = EnumPlayers.PlayerTwo;
         }
     }
 }

@@ -20,5 +20,25 @@ public class AllCell : MonoBehaviour
     {
         return CellsMassiv[x, y];
     }
+
+    public Unit GetUnit(Cell cell)
+    {
+        if (cell.CurrentUnit == null)
+        {
+            Debug.LogWarning("В Процессе запроса юнита из клетки в классе AllCell, произошла ошибка, так как в ней нет юнита.");
+            return null;
+        }
+        return cell.CurrentUnit;
+    }
+
+    public Cell GetCellOnUnit(Unit unit)
+    {
+        foreach (Cell cell in Cells)
+        {
+            if (cell.CurrentUnit == unit) return cell;
+        }
+        Debug.LogWarning($"В Процессе запроса клетки которой пренадлежит {unit.name} в классе AllCell, произошла ошибка, этот юнит не принадлежит не одной из клеток.");
+        return null;
+    }
     
 }

@@ -1,199 +1,554 @@
+using System;
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using Zenject;
+
+// Имеется проблема - если нажать на клетку для перемещения не попадая заранее мышкой на юнита - то юнит останется со старым материалом!
 
 [RequireComponent(typeof(Unit))]
 public class UnitSelectionPointer : MonoBehaviour, IPointerEnterHandler, IPointerClickHandler, IPointerExitHandler
 {
     [Inject] private ContainerStatusGame _statusGame;
-    [Inject] private SelectionMaterialManager _selectionPointerColors;
+    [Inject] private SelectionMaterialManager _selectionMaterials;
     [Inject] private MoveSystem _moveSystem;
-    [Inject] private AllPlayer _allPlayer;
-    [Inject] private PlayerManager _playerManager;
+    [Inject] private AdvancedCursorController _animatedCursor;
+    //[Inject] private UnitManager _unitManager;
 
-    private static UnitSelectionPointer _currentSelectedUnit; // Статическая ссылка на выбранный юнит
-
-    private Unit _unit;
-    private Material _oldMaterial;
-    private MeshRenderer _meshRenderer;
+    private static UnitSelectionPointer _oldSelectedUnitStatic;
     private bool _selected = false;
+    private Unit _unit;
+    private Material _originalMaterial;
+    private MeshRenderer _meshRenderer;
+
+    public event Action<Unit> OnUnitSelected;
+    public event Action<Unit> OnUnitEnter;
+    public event Action<Unit> OnUnitExit;
 
     private void Awake()
     {
-        // Добавляем проверки
-        if (_statusGame == null && _selectionPointerColors == null && _moveSystem == null)
-        {
-            _statusGame = FindObjectOfType<ContainerStatusGame>();
-            _selectionPointerColors = FindObjectOfType<SelectionMaterialManager>();
-            _moveSystem = FindObjectOfType<MoveSystem>();
-            _allPlayer = FindObjectOfType<AllPlayer>();
-            _playerManager = FindObjectOfType<PlayerManager>();
-        }
-
-        if (_statusGame == null)
-        {
-            Debug.LogError($"ContainerStatusGame не инжектирован в {gameObject.name}", this);
-            enabled = false;
-            return;
-        }
-
         _unit = GetComponent<Unit>();
         _meshRenderer = GetComponent<MeshRenderer>();
-        _oldMaterial = _meshRenderer.material;
+        _originalMaterial = _meshRenderer.material;
 
-        if (_statusGame == null) Debug.Log("! Статуса еще не существует !");
+        SetInjectionAndValidateDependencies(); // Проверка всех зависимостей и инженктирование DI при необходимости
 
-        // Подписываемся на событие "изменения стадии игры"
-        _statusGame.OnStatusChanged += TransferSelect;
-        _statusGame.OnStatusChanged += OnGameStatusChanged;
-
-        if (_unit == null)
-        {
-            Debug.LogError($"Unit не найден на {gameObject.name}", this);
-        }
+        _statusGame.OnStatusChanged += ResetMaterialOldUnit;
     }
 
-    private void OnDestroy()
+    /// <summary>
+    /// Главная функция для выбора персонажа.
+    /// </summary>
+    /// <param name="selected">Отмечать персонажа, как выбранного?</param>
+    /// <param name="setActionTarget">Передавать персонажа, как вражеского?</param>
+    /// <param name="nextStatusGame">На какую стадию игры переводить?</param>
+    /// <param name="setMaterial">Какой материал установить персонажу?</param>
+    private void MainSelectAction(bool selected, bool setActionTarget, EnumStatusGame nextStatusGame, Material setMaterial)
     {
-        _statusGame.OnStatusChanged -= TransferSelect;
-        _statusGame.OnStatusChanged -= OnGameStatusChanged;
+        _selected = selected;                                       // Статус выбранного персонажа
+
+        if (setActionTarget) _moveSystem.SetActionTarget(_unit);    // Если true, то передает выбранного персонажа как ActionTarget в _moveSystem
+        else _moveSystem.SetSelectedUnit(_unit);                    // Если false, то передает выбранного персонажа как SelectedUnit в _moveSystem
+
+        _statusGame.StatusUpdate(nextStatusGame);                   // Переводит на новую стадию игры
+
+        _meshRenderer.material = setMaterial;                       // Устанавливает материал для выбранного персонажа
     }
 
-    private void OnGameStatusChanged(EnumStatusGame newStatus)
+    private void SelectAttack()
     {
-        if (newStatus == EnumStatusGame.Hit)
-        {
-            //_moveSystem.SetUnitAction(_unit);
-            Debug.Log("Данные о Вражеском Персонаже переданы...");
-            Deselect(); // Автоматическое снятие выбора
-        }
-        if (newStatus >= EnumStatusGame.SelectedCell && _selected)
-        {
-            _moveSystem.SetUnitAction(_unit);
-            //// Через Событие статуса игры, передаем выбранного персонажа на стадии выбора действия
-            //_moveSystem.SetUnitAction(_unit);
-            Debug.Log("Персонаж отвязан - была выбрана клетка.");
-            Deselect(); // Автоматическое снятие выбора
-        }
-    }
-
-    private void TransferSelect(EnumStatusGame newStatus)
-    {
-        if (newStatus == EnumStatusGame.SelectedUnit && _selected)
-        {
-            // Через Событие статуса игры, передаем нашего выбранного персонажа на стадии выбора персонажа
-            _moveSystem.SetUnitSelected(_unit);
-            Debug.Log("Данные о Персонаже переданы...");
-        }
-    }
-
-    private void Focus()
-    {
-        if (!_selectionPointerColors) return;
-
-        //if (_unit.GetStatusUnit == EnumStatusUnit.Enemy) return;
-
-        if (!_selected && _statusGame.Status < EnumStatusGame.SelectedCell) // Фокус только для невыбранных юнитов
-        {
-            _meshRenderer.material = _selectionPointerColors.GetFocusMaterialUnit;
-        }
-
-        if (_unit.GetStatusUnit == EnumStatusUnit.Enemy)
-        {
-            _meshRenderer.material = _selectionPointerColors.GetFocusMaterialEnemyUnit;
-        }
+        MainSelectAction(false, true, EnumStatusGame.Hit, _originalMaterial);
+        ResetOldUnit();
+        OnUnitSelected?.Invoke(_unit);
     }
 
     private void Select()
     {
-        //// 1. Проверка текущего состояния игры
-        //if (_statusGame.Status >= EnumStatusGame.SelectedCell)
-        //    return;
+        MainSelectAction(true, false, EnumStatusGame.SelectedUnit, _selectionMaterials.GetFocusMaterialUnit);
+        OnUnitSelected?.Invoke(_unit);
+        ResetOldUnit();
+        _oldSelectedUnitStatic = this;
+    }
 
-        //// 2. Обработка выбора вражеского юнита
-        //if (_unit.GetStatusUnit == EnumStatusUnit.Enemy)
-        //{
-        //    HandleEnemySelection();
-        //    return;
-        //}
+    private void ResetOldUnit()
+    {
+        if (_oldSelectedUnitStatic)
+        {
+            _oldSelectedUnitStatic._meshRenderer.material = _oldSelectedUnitStatic._originalMaterial;
+            _oldSelectedUnitStatic._selected = false;
+            _oldSelectedUnitStatic = null;
+        }
+        if (_statusGame.Status == EnumStatusGame.SelectedCell
+            && _unit.GetStatusUnit == EnumStatusUnit.My)
+            _meshRenderer.material = _originalMaterial;
+    }
 
+    private void ResetMaterialOldUnit(EnumStatusGame obj) => ResetOldUnit();
 
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        if (_selectionMaterials == null) return;
 
-        if (_statusGame.Status >= EnumStatusGame.SelectedCell) return;
+        OnUnitEnter?.Invoke(_unit);
 
-        // ВЫбор вражеского юнита на стадии выбора персонажа
+        // Стадия - выбор действия: Наведение курсора - на врага 
         if (_unit.GetStatusUnit == EnumStatusUnit.Enemy && _statusGame.Status == EnumStatusGame.SelectedUnit)
         {
-            _statusGame.StatusUpdate(EnumStatusGame.Hit);
+            _animatedCursor.SetCursorState(EnumStatusCursor.Attack);
+            _meshRenderer.material = _selectionMaterials.GetFocusMaterialEnemyUnit;
         }
-        else if (_unit.GetStatusUnit == EnumStatusUnit.Enemy && _statusGame.Status == EnumStatusGame.SelectedCell)
+        // Стадия - выбор персонажа: Наведение курсора - на врага 
+        else if (_unit.GetStatusUnit == EnumStatusUnit.Enemy && _statusGame.Status != EnumStatusGame.SelectedUnit)
         {
-            _currentSelectedUnit?.Deselect();
+
         }
-        else if (_unit.GetStatusUnit == EnumStatusUnit.Enemy && _statusGame.Status < EnumStatusGame.SelectedUnit) return;
-
-        // Если кликнули на свой новый юнит
-        if (!_selected && _unit.GetStatusUnit != EnumStatusUnit.Enemy)
-        {
-            // Снимаем выбор с предыдущего юнита
-            _currentSelectedUnit?.Deselect();
-
-            // Выбираем текущий
-            _selected = true;
-
-            _statusGame.StatusUpdate(EnumStatusGame.SelectedUnit);
-            _meshRenderer.material = _selectionPointerColors.GetSelectMaterialUnit;
-            _currentSelectedUnit = this;
-        }
-        // Если кликнули на уже выбранный юнит - снимаем выбор
+        // Стадия - любая: Наведение курсора - на дружественного персонажа
         else
         {
-            Deselect();
+            _animatedCursor.SetCursorState(EnumStatusCursor.Select);
+            _meshRenderer.material = _selectionMaterials.GetFocusMaterialUnit;
         }
     }
 
-    private void Deselect()
+    public void OnPointerClick(PointerEventData eventData)
     {
-        // Если это новый юнит
-        if (!_selected) return;
-
-        _selected = false;
-
-        // Если клетка небыла выбрана
-        if (_statusGame.Status < EnumStatusGame.SelectedCell) _statusGame.StatusUpdate(EnumStatusGame.Empty);
-
-        _meshRenderer.material = _oldMaterial;
-
-        // Если это старый выбранный юнит
-        if (_currentSelectedUnit == this)
+        // Стадия - выбор персонажа: Наведение курсора - на врага (Атака)
+        if (_statusGame.Status == EnumStatusGame.SelectedUnit
+            && _unit.GetStatusUnit == EnumStatusUnit.Enemy)
         {
-            // Очищаем переменную от значения
-            _currentSelectedUnit = null;
+            SelectAttack();
+            _animatedCursor.SetCursorState(EnumStatusCursor.Default);
         }
-    }
-
-    private void Exit()
-    {
-        // Если отводим курсор от невыбранного юнита (новый)
-        if (!_selected)
+        // Стадия - выбор персонажа или выбор действия: Наведение курсора - на дружественного персонажа (Выбор для передвижения)
+        else if ((_statusGame.Status == EnumStatusGame.SelectedUnit ||
+            _statusGame.Status == EnumStatusGame.Empty)
+            && _unit.GetStatusUnit == EnumStatusUnit.My)
         {
-            _meshRenderer.material = _oldMaterial;
+            Select();
         }
     }
 
-    public void OnPointerClick(PointerEventData eventData) => Select();
-
-    public void OnPointerEnter(PointerEventData eventData) => Focus();
-
-    public void OnPointerExit(PointerEventData eventData) => Exit();
-
-    public bool Selected()
+    public void OnPointerExit(PointerEventData eventData)
     {
-        if (_currentSelectedUnit == this && _selected) return true;
-        else return false;
+        _animatedCursor.SetCursorState(EnumStatusCursor.Default);
+        OnUnitExit?.Invoke(_unit);
+        if (!_selected || (_selected && _unit.GetStatusUnit == EnumStatusUnit.Enemy) || (_oldSelectedUnitStatic != this && _unit.GetStatusUnit == EnumStatusUnit.My))
+        _meshRenderer.material = _originalMaterial;
+    }
+
+    private bool ValidateDependencies()
+    {
+        var isValid = true;
+
+        if (_statusGame == null)
+        {
+            Debug.LogError("ContainerStatusGame не инжектирован", this);
+            isValid = false;
+        }
+
+        if (_moveSystem == null)
+        {
+            Debug.LogError("MoveSystem не инжектирован", this);
+            isValid = false;
+        }
+
+        if (_selectionMaterials == null)
+        {
+            Debug.LogError("SelectionMaterialManager не инжектирован", this);
+            isValid = false;
+        }
+
+        if (_animatedCursor == null)
+        {
+            Debug.LogError("AnimatedCursor не инжектирован", this);
+            isValid = false;
+        }
+
+        if (_unit == null)
+        {
+            Debug.LogError("Unit компонент отсутствует", this);
+            isValid = false;
+        }
+        return isValid;
+    }
+
+    private void SetInjectionAndValidateDependencies()
+    {
+        if (_statusGame == null && _selectionMaterials == null && _moveSystem == null && _animatedCursor == null)
+        {
+            _statusGame = FindObjectOfType<ContainerStatusGame>();
+            _selectionMaterials = FindObjectOfType<SelectionMaterialManager>();
+            _moveSystem = FindObjectOfType<MoveSystem>();
+            _animatedCursor = FindObjectOfType<AdvancedCursorController>();
+        }
+
+        ValidateDependencies();
     }
 }
+
+
+
+
+//[RequireComponent(typeof(Unit))]
+//public class UnitSelectionPointer : MonoBehaviour,
+//    IPointerEnterHandler,
+//    IPointerClickHandler,
+//    IPointerExitHandler
+//{
+//    // Инжектим зависимости через DI-контейнер (Zenject или аналог)
+//    [Inject] private ContainerStatusGame _statusGame;               // Хранит глобальное состояние игры
+//    [Inject] private SelectionMaterialManager _selectionMaterials;  // Управление материалами выделения
+//    [Inject] private MoveSystem _moveSystem;                        // Система управления перемещением
+
+//    private Unit _unit;                 // Ссылка на родительский компонент Unit
+//    private Material _originalMaterial; // Исходный материал объекта
+//    private MeshRenderer _meshRenderer; // Рендерер для изменения материалов
+//    private bool _isSelected;           // Флаг текущего выделения
+
+//    // События для внешней подписки
+//    public event Action<Unit> OnUnitSelected; // Вызывается при любом выборе юнита
+//    public event Action<Unit> OnUnitEnter;    // Наведение курсора
+//    public event Action<Unit> OnUnitExit;     // Уход курсора
+
+//    private void Awake()
+//    {
+//        // Резервный поиск зависимостей если DI не сработал
+//        if (_statusGame == null && _selectionMaterials == null && _moveSystem == null)
+//        {
+//            _statusGame = FindObjectOfType<ContainerStatusGame>();
+//            _selectionMaterials = FindObjectOfType<SelectionMaterialManager>();
+//            _moveSystem = FindObjectOfType<MoveSystem>();
+//        }
+
+//        // Инициализация компонентов
+//        _unit = GetComponent<Unit>();
+//        _meshRenderer = GetComponent<MeshRenderer>();
+//        _originalMaterial = _meshRenderer.material;     // Сохраняем оригинальный материал
+
+//        if (!ValidateDependencies()) enabled = false;   // Отключаем при ошибках
+//    }
+
+//    private bool ValidateDependencies()
+//    {
+//        // Проверка критически важных зависимостей
+//        if (_statusGame == null || _moveSystem == null || _unit == null)
+//        {
+//            Debug.LogError("Отсутствуют критические зависимости!", this);
+//            return false;
+//        }
+//        return true;
+//    }
+
+//    public void OnPointerClick(PointerEventData eventData)
+//    {
+//        if (!enabled) return;
+
+//        // Сброс предыдущего выделения через контейнер состояния
+//        if (_statusGame.LastSelectedPointer != null)
+//        {
+//            _statusGame.LastSelectedPointer.ResetSelection();
+//        }
+
+//        // Установка нового состояния выделения
+//        _isSelected = true;
+//        _statusGame.LastSelectedPointer = this;
+//        _meshRenderer.material = GetSelectedMaterial();
+
+//        // ОСНОВНАЯ ИГРОВАЯ ЛОГИКА ВЫБОРА:
+//        // Атака
+//        if (ShouldAttackEnemy())
+//        {
+//            _moveSystem.SetActionTarget(_unit);
+//            _statusGame.StatusUpdate(EnumStatusGame.Hit);
+
+//            // Запуск корутины для сброса после атаки
+//            StartCoroutine(ResetAfterAttack());
+//        }
+//        // Перемещение
+//        else if (ShouldSelectAlly())
+//        {
+//            _moveSystem.SetSelectedUnit(_unit);
+//            _statusGame.StatusUpdate(EnumStatusGame.SelectedUnit);
+//        }
+
+//        // Уведомление подписчиков о выборе
+//        OnUnitSelected?.Invoke(_unit);
+//    }
+
+//    private IEnumerator ResetAfterAttack()
+//    {
+//        // Ожидание завершения логики атаки в следующем кадре
+//        yield return null;
+
+//        // Специальный сброс только для вражеских юнитов
+//        //if (_unit.GetStatusUnit == EnumStatusUnit.My)
+//        //{
+//            ResetSelection();
+//            _statusGame.LastSelectedPointer = null;
+//        //}
+//    }
+
+//    // Условие для атаки врага
+//    private bool ShouldAttackEnemy() =>
+//        _statusGame.Status == EnumStatusGame.SelectedUnit &&    // Должен быть выбран союзник
+//        _unit.GetStatusUnit == EnumStatusUnit.Enemy;            // Цель - враг
+
+//    // Условие для выбора союзника
+//    private bool ShouldSelectAlly() =>
+//        _unit.GetStatusUnit == EnumStatusUnit.My;               // Только свои юниты
+
+//    public void ResetSelection()
+//    {
+//        _isSelected = false;
+//        _meshRenderer.material = _originalMaterial;             // Восстановление исходного материала
+//    }
+
+//    public void OnPointerEnter(PointerEventData eventData)
+//    {
+//        if (!_isSelected)
+//        {
+//            OnUnitEnter?.Invoke(_unit);
+//            _meshRenderer.material = GetHoverMaterial();        // Временное выделение при наведении
+//        }
+//    }
+
+//    public void OnPointerExit(PointerEventData eventData)
+//    {
+//        if (!_isSelected)
+//        {
+//            OnUnitExit?.Invoke(_unit);
+//            _meshRenderer.material = _originalMaterial;         // Сброс при уходе курсора
+//        }
+//    }
+
+//    // Выбор материала в зависимости от типа юнита
+//    private Material GetSelectedMaterial() =>
+//        _unit.GetStatusUnit == EnumStatusUnit.Enemy
+//            ? _selectionMaterials.GetFocusMaterialEnemyUnit     // Красное выделение для врагов
+//            : _selectionMaterials.GetFocusMaterialUnit;         // Синее для союзников
+
+//    // Аналогично для состояния hover
+//    private Material GetHoverMaterial() =>
+//        _unit.GetStatusUnit == EnumStatusUnit.Enemy
+//            ? _selectionMaterials.GetFocusMaterialEnemyUnit
+//            : _selectionMaterials.GetFocusMaterialUnit;
+//}
+
+
+
+//[RequireComponent(typeof(Unit))]
+//public class UnitSelectionPointer : MonoBehaviour,
+//IPointerEnterHandler,
+//IPointerClickHandler,
+//IPointerExitHandler
+//{
+
+
+//    [SerializeField] private Material _focusMaterial;
+//    [SerializeField] private Material _selectedMaterial;
+//    private Material _originalMaterial;
+
+//    private MeshRenderer _meshRenderer;
+//    private Unit _unit;
+//    private bool _isSelected;
+
+//    public bool IsSelected => _isSelected;
+//    public event Action<Unit> OnSelected;
+//    public event Action<Unit> OnDeselected;
+
+//    // Статическое событие для отслеживания смены выбора
+//    public static event Action<Unit> OnSelectionChanged;
+
+
+//    private void Awake()
+//    {
+//        _unit = GetComponent<Unit>();
+//        _meshRenderer = GetComponent<MeshRenderer>();
+//        _originalMaterial = _meshRenderer.material;
+
+//        // Автоматическая подписка на свои же события
+//        OnSelectionChanged += HandleSelectionChange;
+//    }
+
+//    private void OnDestroy()
+//    {
+//        OnSelectionChanged -= HandleSelectionChange;
+//    }
+
+//    public void OnPointerClick(PointerEventData eventData)
+//    {
+//        if (_isSelected)
+//        {
+//            Deselect();
+//        }
+//        else
+//        {
+//            Select();
+//        }
+//    }
+
+//    private void Select()
+//    {
+//        _isSelected = true;
+//        _meshRenderer.material = _selectedMaterial;
+//        OnSelected?.Invoke(_unit);
+//        OnSelectionChanged?.Invoke(_unit);
+//    }
+
+//    private void Deselect()
+//    {
+//        _isSelected = false;
+//        _meshRenderer.material = _originalMaterial;
+//        OnDeselected?.Invoke(_unit);
+//        OnSelectionChanged?.Invoke(null);
+//    }
+
+//    private void HandleSelectionChange(Unit selectedUnit)
+//    {
+//        if (selectedUnit != _unit && _isSelected)
+//        {
+//            _isSelected = false;
+//            _meshRenderer.material = _originalMaterial;
+//        }
+//    }
+
+//    public void OnPointerEnter(PointerEventData eventData)
+//    {
+//        if (!_isSelected)
+//        {
+//            _meshRenderer.material = _focusMaterial;
+//        }
+//    }
+
+//    public void OnPointerExit(PointerEventData eventData)
+//    {
+//        if (!_isSelected)
+//        {
+//            _meshRenderer.material = _originalMaterial;
+//        }
+//    }
+//}
+
+
+
+
+
+//[RequireComponent(typeof(Unit))]
+//public class UnitSelectionPointer : MonoBehaviour, IPointerEnterHandler, IPointerClickHandler, IPointerExitHandler
+//{
+//    [Inject] private ContainerStatusGame _statusGame;
+//    [Inject] private SelectionMaterialManager _selectionMaterials;
+//    [Inject] private MoveSystem _moveSystem;
+//    //[Inject] private UnitManager _unitManager;
+
+//    private Unit _unit;
+//    private Material _originalMaterial;
+//    private MeshRenderer _meshRenderer;
+
+//    public event Action<Unit> OnUnitSelected;
+//    public event Action<Unit> OnUnitEnter;
+//    public event Action<Unit> OnUnitExit;
+
+//    private void Awake()
+//    {
+//        // Добавляем проверки
+//        if (_statusGame == null && _selectionMaterials == null && _moveSystem == null)
+//        {
+//            _statusGame = FindObjectOfType<ContainerStatusGame>();
+//            _selectionMaterials = FindObjectOfType<SelectionMaterialManager>();
+//            _moveSystem = FindObjectOfType<MoveSystem>();
+//            //_unitManager = FindObjectOfType<UnitManager>();
+//            //_allPlayer = FindObjectOfType<AllPlayer>();
+//            //_playerManager = FindObjectOfType<PlayerManager>();
+//        }
+
+//        if (_statusGame == null)
+//        {
+//            Debug.LogError($"ContainerStatusGame не инжектирован в {gameObject.name}", this);
+//            enabled = false;
+//            return;
+//        }
+
+//        // Явная инициализация обязательных компонентов
+//        _unit = GetComponent<Unit>();
+//        _meshRenderer = GetComponent<MeshRenderer>();
+
+//        if (_unit == null || _meshRenderer == null)
+//        {
+//            Debug.LogError($"Критические компоненты не найдены на {gameObject.name}", this);
+//            enabled = false;
+//            return;
+//        }
+
+//        _originalMaterial = _meshRenderer.material;
+//    }
+
+//    public void OnPointerClick(PointerEventData eventData)
+//    {
+//        // Проверка всех зависимостей
+//        if (!ValidateDependencies()) return;
+
+//        // Основная логика
+//        // Удар
+//        if (_statusGame.Status == EnumStatusGame.SelectedUnit
+//            && _unit.GetStatusUnit == EnumStatusUnit.Enemy)
+//        {
+//            _moveSystem.SetActionTarget(_unit);
+//            _statusGame.StatusUpdate(EnumStatusGame.Hit);
+//            OnUnitSelected?.Invoke(_unit);
+//        }
+//        // Перемещение
+//        else if (_unit.GetStatusUnit == EnumStatusUnit.My)
+//        {
+//            _moveSystem.SetSelectedUnit(_unit);
+//            _statusGame.StatusUpdate(EnumStatusGame.SelectedUnit);
+//            OnUnitSelected?.Invoke(_unit);
+//        }
+//    }
+
+//    private bool ValidateDependencies()
+//    {
+//        var isValid = true;
+
+//        if (_statusGame == null)
+//        {
+//            Debug.LogError("ContainerStatusGame не инжектирован", this);
+//            isValid = false;
+//        }
+
+//        if (_moveSystem == null)
+//        {
+//            Debug.LogError("MoveSystem не инжектирован", this);
+//            isValid = false;
+//        }
+
+//        if (_unit == null)
+//        {
+//            Debug.LogError("Unit компонент отсутствует", this);
+//            isValid = false;
+//        }
+
+//        return isValid;
+//    }
+
+//    public void OnPointerEnter(PointerEventData eventData)
+//    {
+//        if (_selectionMaterials == null) return;
+
+//        OnUnitEnter?.Invoke(_unit);
+
+//        _meshRenderer.material = _unit.GetStatusUnit == EnumStatusUnit.Enemy
+//            ? _selectionMaterials.GetFocusMaterialEnemyUnit
+//            : _selectionMaterials.GetFocusMaterialUnit;
+//    }
+
+//    public void OnPointerExit(PointerEventData eventData)
+//    {
+//        OnUnitExit?.Invoke(_unit);
+//        _meshRenderer.material = _originalMaterial;
+//    }
+//}
 
 
 

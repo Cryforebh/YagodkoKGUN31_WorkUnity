@@ -12,11 +12,11 @@ GameObject:
   - component: {fileID: 2409990775164622185}
   - component: {fileID: 5534036581318666084}
   - component: {fileID: 741375929403205063}
-  - component: {fileID: 7051435979552642817}
+  - component: {fileID: 4143300540658350333}
   - component: {fileID: 2005723550629827398}
-  - component: {fileID: 6580486697002940776}
+  - component: {fileID: 4589109428427639964}
   m_Layer: 6
-  m_Name: Unit
+  m_Name: UnitEnemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -65,7 +65,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: ae24fc6b95103324fbd261f5bbd5af6a, type: 2}
+  - {fileID: 2100000, guid: d268e239a4439e147995e507619fb9ca, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -110,7 +110,7 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &7051435979552642817
+--- !u!114 &4143300540658350333
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -137,9 +137,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 781b8a853499e164bb5977ab6f648309, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _focusMaterial: {fileID: 2100000, guid: 726c25904d180a342a4bf045c3a3054f, type: 2}
-  _selectedMaterial: {fileID: 2100000, guid: ec0a6eb9019db41439a10150ae1a41ac, type: 2}
---- !u!114 &6580486697002940776
+--- !u!114 &4589109428427639964
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

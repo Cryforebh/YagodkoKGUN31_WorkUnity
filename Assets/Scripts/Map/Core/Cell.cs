@@ -26,6 +26,7 @@ public class Cell : MonoBehaviour, IPointerEnterHandler, IPointerClickHandler, I
     //[SerializeField] private EnumStatusUnit _isStatusEnemy;
     [SerializeField] private EnumPlayers _player;
 
+    public Unit Unit => _unit;
     public bool CreateUnit => _createUnit;
     //public EnumStatusUnit StatusEnemy => _isStatusEnemy;
     public EnumPlayers Player => _player;
@@ -83,7 +84,7 @@ public class Cell : MonoBehaviour, IPointerEnterHandler, IPointerClickHandler, I
         {
             OnPointerClickEvent?.Invoke(this);
 
-            _moveSystem.SetCell(this);
+            _moveSystem.SetTargetCell(this);
             Debug.Log("Данные выбранной клетки переданы");
 
             _statusGame.StatusUpdate(EnumStatusGame.SelectedCell);
