@@ -29,9 +29,9 @@ public class SpawnUnitOnCell : MonoBehaviour
         // Создаём Юнита в кординатах клетки
         /* - Префаб Юнита устанавливается в самой Клетке если он есть */
         /* - Если не установлен - то создается Юнит из SpawnUnitOnCell */
-        if (cell.Unit == null) newUnit = Instantiate(_unit, cell.transform.position + Vector3.up * 2, Quaternion.identity);
+        if (cell.InstalledStartUnit == null) newUnit = Instantiate(_unit, cell.transform.position + Vector3.up * 2, Quaternion.identity);
         else 
-            newUnit = Instantiate(cell.Unit, cell.transform.position + Vector3.up * 2, Quaternion.identity);
+            newUnit = Instantiate(cell.InstalledStartUnit, cell.transform.position + Vector3.up * 2, Quaternion.identity);
 
         // Подписываем юнита на собития связанные с ним
         //newUnit.
@@ -39,12 +39,16 @@ public class SpawnUnitOnCell : MonoBehaviour
         // Присваиваем юниту владельца (игрока из клетки)
         newUnit.SetPlayer(cell.Player);
 
+        // Поворачиваем согласно стороны владельца
+        if (cell.Player == EnumPlayers.PlayerTwo)
+        newUnit.transform.Rotate(0f, 180f, 0f); 
+
         // Добавляем юнита в коллекцию игрока (в список, который принадлежит Player'у указанного в Cell)
         _player.AddUnitOnPlayer(cell.Player, newUnit);
 
         // Установка статуса при создании
         bool isMy = cell.Player == _playerManager.ActivePlayer;
-        newUnit.SetStatusUnit(isMy ? EnumStatusUnit.My : EnumStatusUnit.Enemy);
+        newUnit.SetStatusUnit(isMy ? EnumStatusUnitEnemy.My : EnumStatusUnitEnemy.Enemy);
 
         // Привязываем юнита к клетке
         cell.SetUnit(newUnit);

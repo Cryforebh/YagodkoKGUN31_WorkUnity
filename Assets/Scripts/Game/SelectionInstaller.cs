@@ -19,6 +19,8 @@ public class SelectionInstaller : MonoInstaller
     private HealthBarManager _healthBarManager;
     [SerializeField]
     private AdvancedCursorController _cursor;
+    [SerializeField]
+    private SoundsUnit _soundsUnitManager;
 
     public override void InstallBindings()
     {
@@ -29,6 +31,6 @@ public class SelectionInstaller : MonoInstaller
         Container.Bind<SpawnUnitOnCell>().FromInstance(_spawnUnitOnCell).AsSingle();
         Container.Bind<AllPlayer>().FromInstance(_player).AsSingle();
         Container.Bind<PlayerManager>().FromInstance(_playerManager).AsSingle();
-
+        Container.Bind<SoundsUnit>().FromInstance(_soundsUnitManager).AsSingle();
     }
 }

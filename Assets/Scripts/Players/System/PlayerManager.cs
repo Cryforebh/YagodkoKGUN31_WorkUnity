@@ -37,7 +37,7 @@ public class PlayerManager : MonoBehaviour
             bool isMy = playerEntry.Key == _activePlayer;
             foreach (Unit unit in playerEntry.Value)
             {
-                unit.SetStatusUnit(isMy ? EnumStatusUnit.My : EnumStatusUnit.Enemy);
+                unit.SetStatusUnit(isMy ? EnumStatusUnitEnemy.My : EnumStatusUnitEnemy.Enemy);
             }
         }
     }

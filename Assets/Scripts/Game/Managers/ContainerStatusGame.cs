@@ -9,18 +9,8 @@ public class ContainerStatusGame : MonoBehaviour
 
     private EnumStatusGame _enumStatusGame;
     public EnumStatusGame Status => _enumStatusGame;
-    public int StatusInt => (int)_enumStatusGame;
 
     public UnitSelectionPointer LastSelectedPointer { get; set; }
-
-    public void StatusUpdateInt(int statusGame)
-    {
-        if (_enumStatusGame != (EnumStatusGame)statusGame)
-        {
-            _enumStatusGame = (EnumStatusGame)statusGame;
-            OnStatusChanged?.Invoke(_enumStatusGame); // Триггерим событие
-        }
-    }
 
     public void StatusUpdate(EnumStatusGame statusGame)
     {

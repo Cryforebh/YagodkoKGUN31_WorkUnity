@@ -8,7 +8,7 @@ public class Cell : MonoBehaviour, IPointerEnterHandler, IPointerClickHandler, I
     [Inject] private ContainerStatusGame _statusGame;
     [Inject] private MoveSystem _moveSystem;
     [Inject] private AllCell _allCell;
-    [Inject] private AllPlayer _allPlayer;
+    [Inject] private AdvancedCursorController _cursor;
 
     [Header("Настройка Клетки (Положение в Массиве):")]
     [SerializeField] private int _localX;
@@ -18,17 +18,21 @@ public class Cell : MonoBehaviour, IPointerEnterHandler, IPointerClickHandler, I
     [SerializeField] private MeshRenderer _focus;
     [SerializeField] private MeshRenderer _select;
 
+    [Header("Мешы для отображения доступных клеток:")]
+    [SerializeField] private MeshRenderer _moveFocus;
+    [SerializeField] private MeshRenderer _attackFocus;
+
     [Header("Создавать ли Unit'та на клетке?")]
     [SerializeField] private bool _createUnit = false;
 
     [Header("Настройки Unit'та:")]
-    [SerializeField] private Unit _unit;
-    //[SerializeField] private EnumStatusUnit _isStatusEnemy;
+    [SerializeField] private Unit _installedStartUnit;
     [SerializeField] private EnumPlayers _player;
 
-    public Unit Unit => _unit;
+    public int LocalX => _localX;
+    public int LocalY => _localY;
+    public Unit InstalledStartUnit => _installedStartUnit;
     public bool CreateUnit => _createUnit;
-    //public EnumStatusUnit StatusEnemy => _isStatusEnemy;
     public EnumPlayers Player => _player;
     public Unit CurrentUnit { get; private set; }
     public event Action<Cell> OnPointerClickEvent;
@@ -39,13 +43,12 @@ public class Cell : MonoBehaviour, IPointerEnterHandler, IPointerClickHandler, I
     private void Awake()
     {
         _position = transform.position;
-        //_allCell.cells.Add(this);
         _allCell.SetCell(this, _localX, _localY);
     }
 
     private void Start()
     {
-        if (!CurrentUnit && _createUnit) CurrentUnit = _unit;
+        if (!CurrentUnit && _createUnit) CurrentUnit = _installedStartUnit;
         ResetAll();
     }
 
@@ -67,27 +70,42 @@ public class Cell : MonoBehaviour, IPointerEnterHandler, IPointerClickHandler, I
         _isSelected = false;
     }
 
+    public void MoveFocus(bool activate) => _moveFocus.enabled = activate;
+    public void MoveAttackFocus(bool activate) => _attackFocus.enabled = activate;
     public void SetUnit(Unit unit) => CurrentUnit = unit;
     public void ClearUnit() => CurrentUnit = null;
 
     public void OnPointerEnter(PointerEventData eventData)
     {
+        // Проверяет, является ли клетка одной из доступных для хода (чтобы не кликнуть)
+        if (!_moveSystem.IsAvailableCell(this)) return;
+
         if (_statusGame.Status == EnumStatusGame.SelectedUnit && !_isSelected && CurrentUnit == null)
         {
             _focus.enabled = true;
+
+            // Курсор - Выбор
+            _cursor.SetCursorState(EnumStatusCursor.Select);
         }
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
+        // Проверяет, является ли клетка одной из доступных для хода (чтобы не кликнуть)
+        if (!_moveSystem.IsAvailableCell(this)) return;
+
         if (_statusGame.Status == EnumStatusGame.SelectedUnit && CurrentUnit == null)
         {
             OnPointerClickEvent?.Invoke(this);
 
-            _moveSystem.SetTargetCell(this);
+            _moveSystem.SetTargetActionCell(this);
             Debug.Log("Данные выбранной клетки переданы");
 
+            // Курсор - Дефолт
+            _cursor.SetCursorState(EnumStatusCursor.Default);
+
             _statusGame.StatusUpdate(EnumStatusGame.SelectedCell);
+
         }
         else if (CurrentUnit != null)
         {
@@ -96,7 +114,13 @@ public class Cell : MonoBehaviour, IPointerEnterHandler, IPointerClickHandler, I
     }
 
     public void OnPointerExit(PointerEventData eventData)
-        => _focus.enabled = false;
+    {
+        _focus.enabled = false;
+
+        // Курсор - Дефолт
+        _cursor.SetCursorState(EnumStatusCursor.Default);
+    }
+
 
     public Vector3 GetPosition() => _position;
 }

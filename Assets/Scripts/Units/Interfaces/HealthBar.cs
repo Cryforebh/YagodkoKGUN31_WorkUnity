@@ -40,6 +40,7 @@ public class HealthBar : MonoBehaviour, IPointerEnterHandler, IPointerClickHandl
 
     public void OnPointerEnter(PointerEventData eventData)
     {
+        if (_unit.IsDead) return;
         _canvas.enabled = true;
         Disaplay();
     }
@@ -60,7 +61,7 @@ public class HealthBar : MonoBehaviour, IPointerEnterHandler, IPointerClickHandl
     {
         PositionOnUnit();
         _maxHealth = _unit.GetMaxHealth;
-        _currentHealth = _unit.GetHealth;
+        _currentHealth = _unit.Health;
         _healthBar.fillAmount = _currentHealth / _maxHealth;
     }
 

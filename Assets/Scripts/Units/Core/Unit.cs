@@ -1,10 +1,11 @@
 using System;
-using System.ComponentModel;
+using System.Collections;
+using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using Zenject;
 
-public class Unit : MonoBehaviour
+public abstract class Unit : MonoBehaviour
 {
     [Inject] private AllPlayer _allPlayer;
 
@@ -14,20 +15,65 @@ public class Unit : MonoBehaviour
     private float _baseDamage = 2f;
     private float _weaponDamage = 0;
     private float _baseStrength = 3f;
-    private EnumStatusUnit _statusUnit;
+    private int _attackRange;
+    private int _moveRange;
+    private int _level = 1;
+    private float _deathDelay = 2f;
+    private Collider _collider;
+    private Animator _animator;
+    private List<AudioClip> _soundsSelect;
+    private List<AudioClip> _soundsGoCell;
+    private List<AudioClip> _soundsAttack;
+    private List<AudioClip> _soundsDead;
+    private AudioSource _audioSource;
+    private EnumStatusUnitEnemy _statusUnit;
     private EnumPlayers _player;
+    private EnumStatusUnitClass _class;
+    private EnumAttackPattern _attackPattern;
 
     public float GetDamage => _baseDamage + _baseStrength + _weaponDamage;
     public float GetStrength => _baseStrength;
-    public float GetHealth => _health;
-    public float GetMaxHealth {  get; private set; }
+    public float Health { get => _health; protected set => _health = value; }
+    public int AttackRange { get => _attackRange; protected set => _attackRange = value; }
+    public int MoveRange { get => _moveRange; protected set => _moveRange = value; }
+    public float GetMaxHealth { get; private set; }
     public float GetPastDamage { get; private set; }
     public bool IsDead { get; private set; }
-    public EnumStatusUnit GetStatusUnit => _statusUnit;
-    public EnumPlayers Player => _player;
+    public int Level => _level;
+    public float DeadDelay { get => _deathDelay; protected set => _deathDelay = value; }
+    public List<AudioClip> SoundSelect { get => _soundsSelect; protected set => _soundsSelect = value; }
+    public List<AudioClip> SoundGoCell { get => _soundsGoCell; protected set => _soundsGoCell = value; }
+    public List<AudioClip> SoundAttack { get => _soundsAttack; protected set => _soundsAttack = value; }
+    public List<AudioClip> SoundDead { get => _soundsDead; protected set => _soundsDead = value; }
+    public AudioSource AudioSoundSource { get => _audioSource; protected set => _audioSource = value; }
+    public EnumStatusUnitEnemy StatusUnit { get => _statusUnit; protected set => _statusUnit = value; }
+    public EnumPlayers Player { get => _player; protected set => _player = value; }
+    public EnumStatusUnitClass Class { get => _class; protected set => _class = value; }
+    public EnumAttackPattern AttackPattern { get => _attackPattern; protected set => _attackPattern = value; }
 
     public event Action<Unit> DeadUnitEvent;
     public event Action<Unit> HitDamageUnitEvent;
+    public event Action<Unit> LevelUpEvent;
+
+    private void Awake()
+    {
+        _collider = GetComponent<Collider>();
+        _audioSource = GetComponent<AudioSource>();
+        _allPlayer = FindObjectOfType<AllPlayer>();
+    }
+
+    private void Start()
+    {
+        if (_audioSource == null)
+        {
+            Debug.LogError($"Отсутствует компонент AudioSource на {this.name}!");
+        }
+
+        name = "Юнит";
+        _position = transform.position;
+        _health = _baseHealth + _baseStrength;
+        GetMaxHealth = _health;
+    }
 
     public void SetStandardCharacter(float baseHealth, float baseStrength)
     {
@@ -37,16 +83,37 @@ public class Unit : MonoBehaviour
         GetMaxHealth = _health;
     }
 
-    public void SetWeaponDamage(float weaponDamage)
+    public void SetWeaponDamage(float weaponDamage) => _weaponDamage = weaponDamage;
+    public void SetAttackRange(int range) => _attackRange = range;
+    public void SetStatusUnit(EnumStatusUnitEnemy statusUnit) => _statusUnit = statusUnit;
+    public void SetStatusClass(EnumStatusUnitClass statusUnitClass) => _class = statusUnitClass;
+    public void SetAttackPattern(EnumAttackPattern enumAttackPattern) => _attackPattern = enumAttackPattern;
+    public void SetPlayer(EnumPlayers player) => _player = player;
+
+    public void LevelUp(int countUp)
     {
-        _weaponDamage = weaponDamage;
+        if (countUp <= 0) return;
+
+        _level += countUp;
+
+        _baseStrength += 1 * countUp;
+        _baseHealth += 3 * countUp;
+        //AttackRange += 1 * countUp;
+        MoveRange += 1 * countUp;
+
+        var oldMaxHealth = GetMaxHealth;
+        GetMaxHealth = _baseHealth + _baseStrength;
+
+        _health = GetMaxHealth - (oldMaxHealth - _health);
+
+        var massPlus = 0.1f * countUp;
+        if (transform.localScale.x < 1.5f && transform.localScale.y < 1.5f && transform.localScale.z < 1.5f)
+            transform.localScale += new Vector3(massPlus, massPlus, massPlus);
+
+        LevelUpEvent?.Invoke(this);
     }
 
-    public void SetStatusUnit(EnumStatusUnit statusUnit) => _statusUnit = statusUnit;
-
-    public void SetPlayer(EnumPlayers player) =>  _player = player;
-
-    public void HitDamageHealth(float Damage) 
+    public void HitDamageHealth(float Damage)
     {
         var min = Damage / 2;
         var max = Damage;
@@ -61,25 +128,35 @@ public class Unit : MonoBehaviour
 
     private void Dead(Unit unitDead)
     {
+        if (IsDead) return; // Защита от повторного вызова
+
         DeadUnitEvent?.Invoke(this);
         IsDead = true;
+
+        StartCoroutine(DeathProcess());
+    }
+
+    private IEnumerator DeathProcess()
+    {
+        // 1. Запустить анимацию смерти
+        //_animator.SetTrigger("Die");
+
+        // 2. Отключить коллайдер и управление
+        //_collider.enabled = false;
         _allPlayer.RemoveUnitOnPlayer(Player, this);
+        // GetComponent<PlayerMovement>().enabled = false; // Пример отключения скрипта
+
+        // 3. Ждать заданное время
+        yield return new WaitForSeconds(_deathDelay);
+
+        Debug.Log($"{this.name}: Умер окончательно!");
+
         enabled = false;
         gameObject.SetActive(false);
         this.IsDestroyed();
-    }
 
-    private void Awake()
-    {
-        _allPlayer = FindObjectOfType<AllPlayer>();
-    }
-
-    private void Start()
-    {
-        name = "Юнит";
-        _position = transform.position;
-        _health = _baseHealth + _baseStrength;
-        GetMaxHealth = _health;
+        // 4. Окончательные действия (например, исчезновение)
+        //Destroy(gameObject); // Или gameObject.SetActive(false);
     }
 
     public Vector3 GetPosition()
@@ -90,15 +167,5 @@ public class Unit : MonoBehaviour
     public Unit GetUnit()
     {
         return this;
-    } 
-
-    private void CurrentUnit(Unit unit)
-    {
-        unit = this; 
-    }
-
-    private void OnDestroy()
-    {
- 
     }
 }

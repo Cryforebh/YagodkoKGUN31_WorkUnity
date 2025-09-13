@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using Zenject;
@@ -14,6 +12,7 @@ public class UnitSelectionPointer : MonoBehaviour, IPointerEnterHandler, IPointe
     [Inject] private SelectionMaterialManager _selectionMaterials;
     [Inject] private MoveSystem _moveSystem;
     [Inject] private AdvancedCursorController _animatedCursor;
+    [Inject] private SoundsUnit _soundUnit;
     //[Inject] private UnitManager _unitManager;
 
     private static UnitSelectionPointer _oldSelectedUnitStatic;
@@ -21,6 +20,10 @@ public class UnitSelectionPointer : MonoBehaviour, IPointerEnterHandler, IPointe
     private Unit _unit;
     private Material _originalMaterial;
     private MeshRenderer _meshRenderer;
+    private Cloth _cloth;
+    
+    //private Material _originalMaterialCloth;
+    //private MeshRenderer _meshRendererCloth;
 
     public event Action<Unit> OnUnitSelected;
     public event Action<Unit> OnUnitEnter;
@@ -29,12 +32,26 @@ public class UnitSelectionPointer : MonoBehaviour, IPointerEnterHandler, IPointe
     private void Awake()
     {
         _unit = GetComponent<Unit>();
-        _meshRenderer = GetComponent<MeshRenderer>();
-        _originalMaterial = _meshRenderer.material;
+        //_soundUnit = GetComponent<SoundsUnit>();
+        //_meshRenderer = GetComponent<MeshRenderer>();
+
+        //_originalMaterial = _meshRenderer.material;
 
         SetInjectionAndValidateDependencies(); // Проверка всех зависимостей и инженктирование DI при необходимости
 
         _statusGame.OnStatusChanged += ResetMaterialOldUnit;
+    }
+
+    private void Start()
+    {
+        _cloth = GetComponentInChildren<Cloth>();
+        //_meshRendererCloth = _cloth.GetComponent<MeshRenderer>();
+        _meshRenderer = _cloth.GetComponent<MeshRenderer>();
+        _meshRenderer.material = _selectionMaterials.GetMaterialPlayer(_unit.Player);
+        _originalMaterial = _meshRenderer.material;
+
+        //_meshRendererCloth.material = _selectionMaterials.GetMaterialPlayer(_unit.Player);
+        //_originalMaterialCloth = _meshRendererCloth.material;
     }
 
     /// <summary>
@@ -46,14 +63,23 @@ public class UnitSelectionPointer : MonoBehaviour, IPointerEnterHandler, IPointe
     /// <param name="setMaterial">Какой материал установить персонажу?</param>
     private void MainSelectAction(bool selected, bool setActionTarget, EnumStatusGame nextStatusGame, Material setMaterial)
     {
-        _selected = selected;                                       // Статус выбранного персонажа
+        _selected = selected;                                           // Статус выбранного персонажа
 
-        if (setActionTarget) _moveSystem.SetActionTarget(_unit);    // Если true, то передает выбранного персонажа как ActionTarget в _moveSystem
-        else _moveSystem.SetSelectedUnit(_unit);                    // Если false, то передает выбранного персонажа как SelectedUnit в _moveSystem
+        if (setActionTarget) _moveSystem.SetTargetActionUnit(_unit);    // Если true, то передает выбранного персонажа как ActionTarget в _moveSystem
+        else
+        {
+            _moveSystem.SetTargetSelectedUnit(_unit);                   // Если false, то передает выбранного персонажа как SelectedUnit в _moveSystem
+            if (_oldSelectedUnitStatic != null)                         // и прошлого выбранного персонажа как OldUnit в _moveSystem
+                _moveSystem.SetOldUnit(_oldSelectedUnitStatic._unit);
 
-        _statusGame.StatusUpdate(nextStatusGame);                   // Переводит на новую стадию игры
+            _moveSystem.ForcedСallSelect();                             // Принудительный вызов смены доступных клеток если статус игры не менялся
+        }
 
-        _meshRenderer.material = setMaterial;                       // Устанавливает материал для выбранного персонажа
+        _statusGame.StatusUpdate(nextStatusGame);                       // Переводит на новую стадию игры
+
+        //_soundUnit.SoundPlayOnUnitAndStatusGame(_unit, nextStatusGame); // Воспроизводит звук персонажа в зависимости от стадии игры
+
+        _meshRenderer.material = setMaterial;                           // Устанавливает материал для выбранного персонажа
     }
 
     private void SelectAttack()
@@ -73,14 +99,14 @@ public class UnitSelectionPointer : MonoBehaviour, IPointerEnterHandler, IPointe
 
     private void ResetOldUnit()
     {
-        if (_oldSelectedUnitStatic)
+        if (_oldSelectedUnitStatic && _oldSelectedUnitStatic._unit != _unit)
         {
             _oldSelectedUnitStatic._meshRenderer.material = _oldSelectedUnitStatic._originalMaterial;
             _oldSelectedUnitStatic._selected = false;
             _oldSelectedUnitStatic = null;
         }
         if (_statusGame.Status == EnumStatusGame.SelectedCell
-            && _unit.GetStatusUnit == EnumStatusUnit.My)
+            && _unit.StatusUnit == EnumStatusUnitEnemy.My)
             _meshRenderer.material = _originalMaterial;
     }
 
@@ -88,18 +114,25 @@ public class UnitSelectionPointer : MonoBehaviour, IPointerEnterHandler, IPointe
 
     public void OnPointerEnter(PointerEventData eventData)
     {
+        if (_unit.IsDead) return;
         if (_selectionMaterials == null) return;
 
         OnUnitEnter?.Invoke(_unit);
 
         // Стадия - выбор действия: Наведение курсора - на врага 
-        if (_unit.GetStatusUnit == EnumStatusUnit.Enemy && _statusGame.Status == EnumStatusGame.SelectedUnit)
+        if (_unit.StatusUnit == EnumStatusUnitEnemy.Enemy && _statusGame.Status == EnumStatusGame.SelectedUnit)
         {
+            // Проверяем растояние до врага (чтобы наведение не фиксировалось, если враг далеко)
+            if (!_moveSystem.IsAvailableCell(_unit)) return;
+
+
+            // Курсор - Атака
             _animatedCursor.SetCursorState(EnumStatusCursor.Attack);
+
             _meshRenderer.material = _selectionMaterials.GetFocusMaterialEnemyUnit;
         }
         // Стадия - выбор персонажа: Наведение курсора - на врага 
-        else if (_unit.GetStatusUnit == EnumStatusUnit.Enemy && _statusGame.Status != EnumStatusGame.SelectedUnit)
+        else if (_unit.StatusUnit == EnumStatusUnitEnemy.Enemy && _statusGame.Status != EnumStatusGame.SelectedUnit)
         {
 
         }
@@ -113,28 +146,48 @@ public class UnitSelectionPointer : MonoBehaviour, IPointerEnterHandler, IPointe
 
     public void OnPointerClick(PointerEventData eventData)
     {
+        if (_unit.IsDead) return;
+
         // Стадия - выбор персонажа: Наведение курсора - на врага (Атака)
         if (_statusGame.Status == EnumStatusGame.SelectedUnit
-            && _unit.GetStatusUnit == EnumStatusUnit.Enemy)
+            && _unit.StatusUnit == EnumStatusUnitEnemy.Enemy)
         {
-            SelectAttack();
+            // Проверяем растояние до врага (чтобы клик не фиксировался, если враг далеко)
+            if (!_moveSystem.IsAvailableCell(_unit)) return;
+
+            // Сюда можно добавлять любые действия
+
+            
+
+            // Курсор - Дефолт
             _animatedCursor.SetCursorState(EnumStatusCursor.Default);
+
+            SelectAttack();
+
+            //_soundUnit.SoundPlay();
         }
         // Стадия - выбор персонажа или выбор действия: Наведение курсора - на дружественного персонажа (Выбор для передвижения)
         else if ((_statusGame.Status == EnumStatusGame.SelectedUnit ||
             _statusGame.Status == EnumStatusGame.Empty)
-            && _unit.GetStatusUnit == EnumStatusUnit.My)
+            && _unit.StatusUnit == EnumStatusUnitEnemy.My)
         {
+            // Сюда можно добавлять любые действия
+            //_soundUnit.SoundPlay();
+
+            _soundUnit.SoundPlayOnUnitAndStatusGame(_unit, EnumStatusGame.SelectedUnit);
+
             Select();
         }
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
+        if (_unit.IsDead) return;
+
         _animatedCursor.SetCursorState(EnumStatusCursor.Default);
         OnUnitExit?.Invoke(_unit);
-        if (!_selected || (_selected && _unit.GetStatusUnit == EnumStatusUnit.Enemy) || (_oldSelectedUnitStatic != this && _unit.GetStatusUnit == EnumStatusUnit.My))
-        _meshRenderer.material = _originalMaterial;
+        if (!_selected || (_selected && _unit.StatusUnit == EnumStatusUnitEnemy.Enemy) || (_oldSelectedUnitStatic != this && _unit.StatusUnit == EnumStatusUnitEnemy.My))
+            _meshRenderer.material = _originalMaterial;
     }
 
     private bool ValidateDependencies()
@@ -181,9 +234,15 @@ public class UnitSelectionPointer : MonoBehaviour, IPointerEnterHandler, IPointe
             _selectionMaterials = FindObjectOfType<SelectionMaterialManager>();
             _moveSystem = FindObjectOfType<MoveSystem>();
             _animatedCursor = FindObjectOfType<AdvancedCursorController>();
+            _soundUnit = FindObjectOfType<SoundsUnit>();
         }
 
         ValidateDependencies();
+    }
+
+    private void OnDestroy()
+    {
+        _statusGame.OnStatusChanged -= ResetMaterialOldUnit;
     }
 }
 
