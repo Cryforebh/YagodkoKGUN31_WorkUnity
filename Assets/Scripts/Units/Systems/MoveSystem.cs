@@ -276,7 +276,7 @@ public class MoveSystem : MonoBehaviour
         _soundUnit.SoundPlayOnUnitAndStatusGame(_targetSelectedUnit, EnumStatusGame.SelectedCell);
 
         // Перемещение
-        _targetSelectedUnit.transform.position = _targetActionCell.transform.position + Vector3.up * 2;
+        _targetSelectedUnit.transform.position = _targetActionCell.transform.position + Vector3.up;
 
         ResetMaterialAllowCell();
         ResetMaterialCellAllowUnit();

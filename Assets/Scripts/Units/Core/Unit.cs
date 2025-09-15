@@ -18,6 +18,7 @@ public abstract class Unit : MonoBehaviour
     private int _attackRange;
     private int _moveRange;
     private int _level = 1;
+    private int _countMass = 5;
     private float _deathDelay = 2f;
     private Collider _collider;
     private Animator _animator;
@@ -106,10 +107,12 @@ public abstract class Unit : MonoBehaviour
 
         _health = GetMaxHealth - (oldMaxHealth - _health);
 
-        var massPlus = 0.1f * countUp;
-        if (transform.localScale.x < 1.5f && transform.localScale.y < 1.5f && transform.localScale.z < 1.5f)
+        var massPlus = 0.04f * countUp;
+        if (_countMass > 0)
+        {
+            _countMass -= 1 * countUp;
             transform.localScale += new Vector3(massPlus, massPlus, massPlus);
-
+        }
         LevelUpEvent?.Invoke(this);
     }
 

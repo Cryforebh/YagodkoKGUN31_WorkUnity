@@ -29,9 +29,9 @@ public class SpawnUnitOnCell : MonoBehaviour
         // Создаём Юнита в кординатах клетки
         /* - Префаб Юнита устанавливается в самой Клетке если он есть */
         /* - Если не установлен - то создается Юнит из SpawnUnitOnCell */
-        if (cell.InstalledStartUnit == null) newUnit = Instantiate(_unit, cell.transform.position + Vector3.up * 2, Quaternion.identity);
+        if (cell.InstalledStartUnit == null) newUnit = Instantiate(_unit, cell.transform.position + Vector3.up /** 2*/, cell.transform.rotation);
         else 
-            newUnit = Instantiate(cell.InstalledStartUnit, cell.transform.position + Vector3.up * 2, Quaternion.identity);
+            newUnit = Instantiate(cell.InstalledStartUnit, cell.transform.position + Vector3.up /** 2*/, cell.transform.rotation);
 
         // Подписываем юнита на собития связанные с ним
         //newUnit.
