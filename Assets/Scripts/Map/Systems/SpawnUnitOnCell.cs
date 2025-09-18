@@ -1,13 +1,36 @@
+using Unity.VisualScripting;
 using UnityEngine;
 using Zenject;
 
 public class SpawnUnitOnCell : MonoBehaviour
 {
+    [Inject] private Board _board;
     [Inject] private AllCell _allCell;
     [Inject] private AllPlayer _player;
     [Inject] private PlayerManager _playerManager;
+    [Inject] private TypeGameManager _gameManager;
     //[Inject] private UnitManager _unitManager;
     [SerializeField] private Unit _unit;
+
+    private Camera _cameraPlayerOne;
+    private Camera _cameraPlayerTwo;
+
+    // Как только создано будет меню с выбором этих элементов - убрать [SerializeField] !!!
+    [SerializeField] private EnumTypeGame _typeGame;
+    [SerializeField] private EnumPlayers _playerGoesFirst;
+
+    private void Awake()
+    {
+        _cameraPlayerOne = _playerManager.GetCameraPlayer(EnumPlayers.PlayerOne);
+        _cameraPlayerTwo = _playerManager.GetCameraPlayer(EnumPlayers.PlayerTwo);
+
+        // Как только создано будет меню с выбором этих элементов - убрать !!!
+        SetTypeGame(_typeGame);
+        SetWhoGoesFirst(_playerGoesFirst);
+        //
+
+        TypeGameCreate();
+    }
 
     private void Start()
     {
@@ -15,14 +38,15 @@ public class SpawnUnitOnCell : MonoBehaviour
         {
             if (cell.CreateUnit)
             {
-                Create(cell);
+
+                CreateUnits(cell);
                 //Debug.Log($"Создан {cell.CurrentUnit.name}, у него {cell.CurrentUnit.GetHealth} здоровья и {cell.CurrentUnit.GetDamage} урона.\n" +
                 //    $"Это {cell.CurrentUnit.GetStatusUnit}!");
             }
         }
     }
 
-    private void Create(Cell cell)
+    private void CreateUnits(Cell cell)
     {
         Unit newUnit;
 
@@ -52,5 +76,39 @@ public class SpawnUnitOnCell : MonoBehaviour
 
         // Привязываем юнита к клетке
         cell.SetUnit(newUnit);
+    }
+
+    private void TypeGameCreate()
+    {
+        if (_typeGame == EnumTypeGame.PVP)
+        {
+            _cameraPlayerTwo.gameObject.SetActive(false);
+            _cameraPlayerOne.gameObject.SetActive(true);
+        }
+        if (_typeGame == EnumTypeGame.PVE)
+        {
+            _board.transform.Rotate(0f, 0f, 90f);
+            _cameraPlayerTwo.gameObject.SetActive(false);
+            _cameraPlayerOne.gameObject.SetActive(true);
+        }
+        if (_typeGame == EnumTypeGame.PVPLocal)
+        {
+            _board.transform.Rotate(0f, 0f, 90f);
+            _cameraPlayerTwo.gameObject.SetActive(true);
+            _cameraPlayerOne.gameObject.SetActive(true);
+        }
+    }
+
+    public void SetTypeGame(EnumTypeGame typeGame)
+    {
+        _typeGame = typeGame;
+        _gameManager.SetTypeGame(_typeGame);
+        Debug.Log($"Тип игры назначен - это {typeGame}!");
+    }
+    public void SetWhoGoesFirst(EnumPlayers player)
+    {
+        _playerGoesFirst = player;
+        _playerManager.ActivePlayer = _playerGoesFirst;
+        Debug.Log($"Стартовый Игрок назначен - это {player}!");
     }
 }

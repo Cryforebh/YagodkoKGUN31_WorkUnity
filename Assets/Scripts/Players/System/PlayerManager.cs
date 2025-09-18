@@ -8,12 +8,19 @@ using Zenject;
 public class PlayerManager : MonoBehaviour
 {
     [Inject] private AllPlayer _players;
+    [Inject] private TypeGameManager _gameManager;
 
     private EnumPlayers _activePlayer = EnumPlayers.None;
 
     public event Action<EnumPlayers> OnActivePlayerChanged; // Событие изменения активного игрока
-
     public event Action<EnumPlayers> OnWinnerDeclared; // Событие Победы
+
+    [SerializeField] private Camera _cameraPlayerOne;
+    [SerializeField] private Camera _cameraPlayerTwo;
+
+    [SerializeField] private WinImage _winImagePlayerOne;
+    [SerializeField] private WinImage _winImagePlayerTwo;
+
 
     public EnumPlayers ActivePlayer
     {
@@ -54,22 +61,46 @@ public class PlayerManager : MonoBehaviour
         {
             Debug.Log("Все игроки уничтожены! Ничья!");
             OnWinnerDeclared?.Invoke(EnumPlayers.None);
+            _winImagePlayerOne.Show(EnumPlayers.None);
+            _winImagePlayerTwo.Show(EnumPlayers.None);
             return EnumPlayers.None;
         }
         else if (activePlayers.Count == 1)
         {
             Debug.Log($"Победитель: {activePlayers[0]}!");
             OnWinnerDeclared?.Invoke(activePlayers[0]);
+            _winImagePlayerOne.Show(activePlayers[0]);
+            _winImagePlayerTwo.Show(activePlayers[0]);
             return activePlayers[0];
         }
 
         return null;
     }
+    
+    public Camera GetCameraPlayer(EnumPlayers player)
+    {
+        switch (player)
+        {
+            case EnumPlayers.None:
+                Debug.LogError($"У этого {player} - Нет камеры!");
+                return null;
+            case EnumPlayers.PlayerOne:
+                return _cameraPlayerOne;
+            case EnumPlayers.PlayerTwo:
+                return _cameraPlayerTwo;
+            case EnumPlayers.PlayerThree:
+                Debug.LogError($"У этого {player} - Нет камеры!");
+                return null;
+            default:
+                Debug.LogError("Назначен не существующий Игрок!");
+                return null;
+        }
+    }
 
     private void Start()
     {
-        // Стартовый активный игрок (пример)
-        ActivePlayer = EnumPlayers.PlayerTwo;
-        Debug.Log($"Стартовый персонаж назначен - это {ActivePlayer}!");
+        //// Стартовый активный игрок (пример)
+        //ActivePlayer = EnumPlayers.PlayerTwo;
+        //Debug.Log($"Стартовый персонаж назначен - это {ActivePlayer}!");
     }
 }

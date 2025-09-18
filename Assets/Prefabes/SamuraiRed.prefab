@@ -125,6 +125,14 @@ MonoBehaviour:
   _bHealth: 15
   _bStrength: 3
   _bDamageWeapon: 3
+  _bAttackRange: 1
+  _bAttackPattern: 0
+  _bMoveRange: 1
+  _bDeathDelay: 2
+  _bSoundsSelect: []
+  _bSoundsGoCell: []
+  _bSoundsAttack: []
+  _bSoundsDead: []
 --- !u!114 &2005723550629827398
 MonoBehaviour:
   m_ObjectHideFlags: 0

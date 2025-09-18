@@ -30,5 +30,6 @@ public class LevelRestartPanel : MonoBehaviour
     private void Awake()
     {
         _fillImage = gameObject.GetComponent<Image>();
+        _fillImage.fillAmount = 0f;
     }
 }

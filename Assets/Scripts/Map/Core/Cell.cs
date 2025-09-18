@@ -116,6 +116,7 @@ public class Cell : MonoBehaviour, IPointerEnterHandler, IPointerClickHandler, I
     public void OnPointerExit(PointerEventData eventData)
     {
         _focus.enabled = false;
+        _select.enabled = false;
 
         // Курсор - Дефолт
         _cursor.SetCursorState(EnumStatusCursor.Default);

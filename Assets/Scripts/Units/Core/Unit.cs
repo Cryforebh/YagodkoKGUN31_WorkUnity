@@ -107,7 +107,7 @@ public abstract class Unit : MonoBehaviour
 
         _health = GetMaxHealth - (oldMaxHealth - _health);
 
-        var massPlus = 0.04f * countUp;
+        var massPlus = 0.02f * countUp;
         if (_countMass > 0)
         {
             _countMass -= 1 * countUp;

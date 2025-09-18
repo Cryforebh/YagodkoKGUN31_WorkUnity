@@ -211,6 +211,12 @@ MonoBehaviour:
   _bDamageWeapon: 3
   _bAttackRange: 7
   _bAttackPattern: 1
+  _bMoveRange: 1
+  _bDeathDelay: 2
+  _bSoundsSelect: []
+  _bSoundsGoCell: []
+  _bSoundsAttack: []
+  _bSoundsDead: []
 --- !u!114 &2005723550629827398
 MonoBehaviour:
   m_ObjectHideFlags: 0

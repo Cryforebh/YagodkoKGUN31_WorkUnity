@@ -8,6 +8,7 @@ using Zenject;
 [RequireComponent(typeof(Unit))]
 public class UnitSelectionPointer : MonoBehaviour, IPointerEnterHandler, IPointerClickHandler, IPointerExitHandler
 {
+    [Inject] private TypeGameManager _gameManager;
     [Inject] private ContainerStatusGame _statusGame;
     [Inject] private SelectionMaterialManager _selectionMaterials;
     [Inject] private MoveSystem _moveSystem;
@@ -230,6 +231,7 @@ public class UnitSelectionPointer : MonoBehaviour, IPointerEnterHandler, IPointe
     {
         if (_statusGame == null && _selectionMaterials == null && _moveSystem == null && _animatedCursor == null)
         {
+            _gameManager = FindObjectOfType<TypeGameManager>();
             _statusGame = FindObjectOfType<ContainerStatusGame>();
             _selectionMaterials = FindObjectOfType<SelectionMaterialManager>();
             _moveSystem = FindObjectOfType<MoveSystem>();
@@ -239,6 +241,14 @@ public class UnitSelectionPointer : MonoBehaviour, IPointerEnterHandler, IPointe
 
         ValidateDependencies();
     }
+
+    //private void IsTypeGame()
+    //{
+    //    if(_gameManager.GameType == EnumTypeGame.PVPLocal)
+    //    {
+    //        if (_unit.Player)
+    //    }
+    //}
 
     private void OnDestroy()
     {

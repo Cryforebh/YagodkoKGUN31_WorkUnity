@@ -13,7 +13,7 @@ TagManager:
   - UI
   - Unit
   - Map
-  - 
+  - ObjectActive
   - 
   - 
   - 
@@ -43,4 +43,7 @@ TagManager:
     locked: 0
   - name: UI
     uniqueID: 3883988191
+    locked: 0
+  - name: Unit
+    uniqueID: 3914103011
     locked: 0

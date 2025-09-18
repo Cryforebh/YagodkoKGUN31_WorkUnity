@@ -21,6 +21,8 @@ public class SelectionInstaller : MonoInstaller
     private AdvancedCursorController _cursor;
     [SerializeField]
     private SoundsUnit _soundsUnitManager;
+    [SerializeField]
+    private BoomEffectController _explosionController;
 
     public override void InstallBindings()
     {
@@ -32,5 +34,6 @@ public class SelectionInstaller : MonoInstaller
         Container.Bind<AllPlayer>().FromInstance(_player).AsSingle();
         Container.Bind<PlayerManager>().FromInstance(_playerManager).AsSingle();
         Container.Bind<SoundsUnit>().FromInstance(_soundsUnitManager).AsSingle();
+        Container.Bind<BoomEffectController>().FromInstance(_explosionController).AsSingle().NonLazy();
     }
 }

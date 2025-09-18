@@ -8,6 +8,7 @@ public class MoveSystem : MonoBehaviour
     [Inject] private AllCell _allCell;
     [Inject] private PlayerManager _playerManager;
     [Inject] private SoundsUnit _soundUnit;
+    [Inject] private BoomEffectController _explosionController;
 
     //[SerializeField] private Camera _cameraMain;
     [SerializeField] private GameObject _cameraOne;
@@ -344,6 +345,8 @@ public class MoveSystem : MonoBehaviour
         {
             // Проигрывается диалог персонажа
             _soundUnit.SoundPlayDead(_targetActionUnit);
+
+            _explosionController.PlayExplosion(_targetActionUnit);
 
             _targetSelectedUnit.LevelUp(1);
             Debug.Log($"{_targetSelectedUnit.name} принадлежащий {_targetSelectedUnit.Player} - Получил новый уровень!");

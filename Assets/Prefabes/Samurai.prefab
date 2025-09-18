@@ -100,7 +100,7 @@ GameObject:
   m_Layer: 6
   m_Name: Samurai
   m_TagString: Untagged
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: 5132851093641282708, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
   m_IsActive: 1
@@ -141,24 +141,24 @@ MonoBehaviour:
   _bAttackRange: 1
   _bAttackPattern: 0
   _bMoveRange: 2
-  _bDeathDelay: 1
+  _bDeathDelay: 0.5
   _bSoundsSelect:
-  - {fileID: 8300000, guid: 7cccfeedb472ce046b18451e7f423bcf, type: 3}
-  - {fileID: 8300000, guid: cea2ff5978663b74e8c2158907b94cb4, type: 3}
-  - {fileID: 8300000, guid: fbdbb20bece077649be1bec341156460, type: 3}
-  - {fileID: 8300000, guid: 0e58b6a2a6bd2a6408d0afa42cc3fa5d, type: 3}
-  - {fileID: 8300000, guid: 40abfe150c833ee4fafc1a3eac40d90f, type: 3}
+  - {fileID: 8300000, guid: 40aa9ec0af67e224b8dc10e6a6e49ed3, type: 3}
+  - {fileID: 8300000, guid: 2c37f0108cdd4b048a9180ea7682c2fb, type: 3}
+  - {fileID: 8300000, guid: 0812b3ebb5b0dd346aeecfdc1b03a8c4, type: 3}
+  - {fileID: 8300000, guid: afa8954baff322146948618a66f262f4, type: 3}
+  - {fileID: 8300000, guid: 7aef3f2187e96a54f88b1021ba6f1c31, type: 3}
   _bSoundsGoCell:
-  - {fileID: 8300000, guid: b00a8b94be3602445b99ee77f7bb1248, type: 3}
-  - {fileID: 8300000, guid: bc2e10153ff86a64a828f1709039aefd, type: 3}
-  - {fileID: 8300000, guid: bc2e10153ff86a64a828f1709039aefd, type: 3}
-  - {fileID: 8300000, guid: b00a8b94be3602445b99ee77f7bb1248, type: 3}
+  - {fileID: 8300000, guid: 177f1b041ff019d4f84181e26099678d, type: 3}
+  - {fileID: 8300000, guid: bafeaeed80ec4a649a2c000b58cd2589, type: 3}
+  - {fileID: 8300000, guid: 2fa1a1c1c3a2fd549969dad15b429846, type: 3}
+  - {fileID: 8300000, guid: 13706acc897c4b747a4f10740c69d6e4, type: 3}
   _bSoundsAttack:
   - {fileID: 8300000, guid: c5d8e390007b8dd4e8e762aef035fde1, type: 3}
   _bSoundsDead:
-  - {fileID: 8300000, guid: df29b61571e89f64db60f446f896bd31, type: 3}
-  - {fileID: 8300000, guid: 75a4e0e04f21c3d4d88e5b142e781da4, type: 3}
-  - {fileID: 8300000, guid: b3378b0cd2b791a4792db0d8ac53ba68, type: 3}
+  - {fileID: 8300000, guid: e8fc797a3132cf048abbed59bdba3ef7, type: 3}
+  - {fileID: 8300000, guid: 0eb6f7928774a894dbaa0b33a853c3ee, type: 3}
+  - {fileID: 8300000, guid: d3a054440285903469cfc56ac3d20b33, type: 3}
 --- !u!114 &1924377747451932338
 MonoBehaviour:
   m_ObjectHideFlags: 0

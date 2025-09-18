@@ -7,4 +7,5 @@ public enum EnumStatusCursor
     Default = 0,
     Select = 1,
     Attack = 2,
+    Kiss = 3,
 }

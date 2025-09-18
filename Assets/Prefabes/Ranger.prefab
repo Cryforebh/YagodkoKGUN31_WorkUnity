@@ -279,7 +279,7 @@ GameObject:
   m_Layer: 6
   m_Name: Ranger
   m_TagString: Untagged
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: 5132851093641282708, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
   m_IsActive: 1
@@ -343,19 +343,24 @@ MonoBehaviour:
   _bAttackRange: 7
   _bAttackPattern: 1
   _bMoveRange: 1
-  _bDeathDelay: 1
+  _bDeathDelay: 0.5
   _bSoundsSelect:
-  - {fileID: 8300000, guid: afccba2e8b53dac4e9153556de47d495, type: 3}
-  - {fileID: 8300000, guid: a0b02dc3fc9560b439d993170c36a945, type: 3}
-  - {fileID: 8300000, guid: 44b2198ded3de9e42a5b648515cda81b, type: 3}
+  - {fileID: 8300000, guid: 40aa9ec0af67e224b8dc10e6a6e49ed3, type: 3}
+  - {fileID: 8300000, guid: 2c37f0108cdd4b048a9180ea7682c2fb, type: 3}
+  - {fileID: 8300000, guid: 0812b3ebb5b0dd346aeecfdc1b03a8c4, type: 3}
+  - {fileID: 8300000, guid: afa8954baff322146948618a66f262f4, type: 3}
+  - {fileID: 8300000, guid: 7aef3f2187e96a54f88b1021ba6f1c31, type: 3}
   _bSoundsGoCell:
-  - {fileID: 8300000, guid: 78e806ef69bf0354d97a6865abf18b92, type: 3}
+  - {fileID: 8300000, guid: 177f1b041ff019d4f84181e26099678d, type: 3}
+  - {fileID: 8300000, guid: bafeaeed80ec4a649a2c000b58cd2589, type: 3}
+  - {fileID: 8300000, guid: 2fa1a1c1c3a2fd549969dad15b429846, type: 3}
+  - {fileID: 8300000, guid: 13706acc897c4b747a4f10740c69d6e4, type: 3}
   _bSoundsAttack:
   - {fileID: 8300000, guid: 705906fc0d882924a8a5d411dbb31b25, type: 3}
   _bSoundsDead:
-  - {fileID: 8300000, guid: f5d28a0df9ecd3b4ea660ee5a2ee1740, type: 3}
-  - {fileID: 8300000, guid: 639ffa0f37bbff1429702a94763c1058, type: 3}
-  - {fileID: 8300000, guid: 971d95bc36657bd42987017a62d237a8, type: 3}
+  - {fileID: 8300000, guid: e8fc797a3132cf048abbed59bdba3ef7, type: 3}
+  - {fileID: 8300000, guid: 0eb6f7928774a894dbaa0b33a853c3ee, type: 3}
+  - {fileID: 8300000, guid: d3a054440285903469cfc56ac3d20b33, type: 3}
 --- !u!114 &1173158566619381890
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -451,7 +456,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0
+      value: 0.0027777778
       inSlope: 0
       outSlope: 0
       tangentMode: 0
