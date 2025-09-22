@@ -20,7 +20,7 @@ public class MainInstaller : MonoInstaller
             .AsSingle();
 
         Container.Bind<LevelRestartPanel>().FromInstance(_restartPanel).AsSingle();
-        Container.Bind<InputLevelManager>().FromInstance(_inputManager).AsSingle();
+        Container.Bind<InputLevelManager>().FromInstance(_inputManager).AsSingle().NonLazy();
         Container.Bind<ContainerStatusGame>().FromInstance(_containerStatusGame).AsSingle().NonLazy();
         Container.Bind<MoveSystem>().FromInstance(_moveSystem).AsSingle().NonLazy();
     }

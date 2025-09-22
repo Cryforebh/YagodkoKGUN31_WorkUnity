@@ -38,16 +38,19 @@ public class HealthBar : MonoBehaviour, IPointerEnterHandler, IPointerClickHandl
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        //_canvas.enabled = false;
+        _canvasPlayerOne.enabled = false;
+        if (_unit.IsDead) return;
+        _canvasPlayerOne.enabled = true;
+        DisplayOne();
     }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
         if (_unit.IsDead) return;
 
-        Debug.Log($"Event camera: {eventData.enterEventCamera?.name}");
-        Debug.Log($"Press camera: {eventData.pressEventCamera?.name}");
-        Debug.Log($"Raycast camera: {eventData.pointerCurrentRaycast.module?.eventCamera?.name}");
+        //Debug.Log($"Event camera: {eventData.enterEventCamera?.name}");
+        //Debug.Log($"Press camera: {eventData.pressEventCamera?.name}");
+        //Debug.Log($"Raycast camera: {eventData.pointerCurrentRaycast.module?.eventCamera?.name}");
 
         if (eventData.pressEventCamera == _cameraOnePlayer)
         {
@@ -59,6 +62,27 @@ public class HealthBar : MonoBehaviour, IPointerEnterHandler, IPointerClickHandl
             _canvasPlayerTwo.enabled = true;
             DisplayTwo();
         }
+
+        if (_unit.Level == 2)
+        {
+            _healthBarManager.LevelTwo.enabled = true;
+        }
+        if (_unit.Level == 3)
+        {
+            _healthBarManager.LevelThree.enabled = true;
+        }
+        if (_unit.Level == 4)
+        {
+            _healthBarManager.LevelFore.enabled = true;
+        }
+        if (_unit.Level == 5)
+        {
+            _healthBarManager.LevelFive.enabled = true;
+        }
+
+        if (_unit.ModifierDefense) _healthBarManager.ModifierDefense.enabled = true;
+        if (_unit.ModifierDamage > 0 && _unit.Class == EnumStatusUnitClass.Samurai) _healthBarManager.ModifierDamage.enabled = true;
+        if (_unit.ModifierDrowRange && _unit.Class == EnumStatusUnitClass.Ranger) _healthBarManager.ModifierDrowRange.enabled = true;
     }
 
     public void OnPointerExit(PointerEventData eventData)
@@ -71,6 +95,15 @@ public class HealthBar : MonoBehaviour, IPointerEnterHandler, IPointerClickHandl
         {
             _canvasPlayerTwo.enabled = false;
         }
+
+        _healthBarManager.LevelTwo.enabled = false;
+        _healthBarManager.LevelThree.enabled = false;
+        _healthBarManager.LevelFore.enabled = false;
+        _healthBarManager.LevelFive.enabled = false;
+
+        _healthBarManager.ModifierDefense.enabled = false;
+        _healthBarManager.ModifierDamage.enabled = false;
+        _healthBarManager.ModifierDrowRange.enabled = false;
     }
 
     private void PositionOnUnitOne()

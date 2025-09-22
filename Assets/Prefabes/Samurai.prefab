@@ -135,9 +135,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a68272be02dff74438567918bd918ca8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _bHealth: 15
+  _bHealth: 14
   _bStrength: 3
-  _bDamageWeapon: 3
+  _bDamageWeapon: 2
   _bAttackRange: 1
   _bAttackPattern: 0
   _bMoveRange: 2
@@ -203,7 +203,7 @@ AudioSource:
   SpatializePostEffects: 0
   Priority: 128
   DopplerLevel: 1
-  MinDistance: 1
+  MinDistance: 6
   MaxDistance: 500
   Pan2D: 0
   rolloffMode: 0

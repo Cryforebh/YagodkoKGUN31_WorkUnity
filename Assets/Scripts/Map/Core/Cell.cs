@@ -29,6 +29,10 @@ public class Cell : MonoBehaviour, IPointerEnterHandler, IPointerClickHandler, I
     [SerializeField] private Unit _installedStartUnit;
     [SerializeField] private EnumPlayers _player;
 
+    [Header("Настройки Модификаторов клетки:")]
+    [SerializeField, Tooltip("Увеличивает: Сопротивление урона на 50%.")] private bool _forest = false;
+    [SerializeField, Tooltip("Увеличивает: Дальность атаки на 1 клетку - Стрелкам; Урон на 1 ед. - Милишникам")] private bool _trees = false;
+
     public int LocalX => _localX;
     public int LocalY => _localY;
     public Unit InstalledStartUnit => _installedStartUnit;
@@ -72,8 +76,38 @@ public class Cell : MonoBehaviour, IPointerEnterHandler, IPointerClickHandler, I
 
     public void MoveFocus(bool activate) => _moveFocus.enabled = activate;
     public void MoveAttackFocus(bool activate) => _attackFocus.enabled = activate;
-    public void SetUnit(Unit unit) => CurrentUnit = unit;
-    public void ClearUnit() => CurrentUnit = null;
+    //public void SetUnit(Unit unit) => CurrentUnit = unit;
+    public void SetUnit(Unit unit)
+    {
+        SetModifier(unit);
+        CurrentUnit = unit;
+    }
+    public void ClearUnit()     
+    {
+        RemoveModifier(CurrentUnit);
+        CurrentUnit = null;
+    }
+
+    private void SetModifier(Unit unit)
+    {
+        if (_forest) unit.ModifierDefense = true;
+        if (_trees && unit.Class == EnumStatusUnitClass.Samurai) unit.ModifierDamage = 2;
+        if (_trees && unit.Class == EnumStatusUnitClass.Ranger)
+        {
+            unit.ModifierDrowRange = true;
+            unit.AttackRange += 1;
+        }
+    }
+    private void RemoveModifier(Unit unit)
+    {
+        if (_forest) unit.ModifierDefense = false;
+        if (_trees && unit.Class == EnumStatusUnitClass.Samurai) unit.ModifierDamage = 0;
+        if (_trees && unit.Class == EnumStatusUnitClass.Ranger)
+        {
+            unit.ModifierDrowRange = false;
+            unit.AttackRange -= 1;
+        } 
+    }
 
     public void OnPointerEnter(PointerEventData eventData)
     {

@@ -15,6 +15,17 @@ public class HealthBarManager : MonoBehaviour
     [SerializeField] private Canvas _canvasPlayerTwo;
     [SerializeField] private Image _healthBarImageTwoPlayer;
 
+    [Header("Настройки отображения уровня персонажа")]
+    [SerializeField] private Image _levelTwo;
+    [SerializeField] private Image _levelThree;
+    [SerializeField] private Image _levelFore;
+    [SerializeField] private Image _levelFive;
+
+    [Header("Настройки отображения Модификаций")]
+    [SerializeField] private Image _modifierDefense;
+    [SerializeField] private Image _modifierDamage;
+    [SerializeField] private Image _modifierDrowRange;
+
     [Header("Настройки Canvas")]
     [SerializeField] private RenderMode _renderMode = RenderMode.ScreenSpaceCamera;
 
@@ -23,6 +34,13 @@ public class HealthBarManager : MonoBehaviour
     public Vector3 Offcet => _offcet;
     public Canvas CanvasPlayerOne => _canvasPlayerOne;
     public Canvas CanvasPlayerTwo => _canvasPlayerTwo;
+    public Image LevelTwo => _levelTwo;
+    public Image LevelThree => _levelThree;
+    public Image LevelFore => _levelFore;
+    public Image LevelFive => _levelFive;
+    public Image ModifierDefense => _modifierDefense;
+    public Image ModifierDamage => _modifierDamage;
+    public Image ModifierDrowRange => _modifierDrowRange;
 
     private void Start()
     {
@@ -31,6 +49,15 @@ public class HealthBarManager : MonoBehaviour
 
         ConfigureCanvas(_canvasPlayerOne, _playerManager.GetCameraPlayer(EnumPlayers.PlayerOne));
         ConfigureCanvas(_canvasPlayerTwo, _playerManager.GetCameraPlayer(EnumPlayers.PlayerTwo));
+
+        _levelTwo.enabled = false;
+        _levelThree.enabled = false;
+        _levelFore.enabled = false;
+        _levelFive.enabled = false;
+
+        _modifierDefense.enabled = false;
+        _modifierDamage.enabled = false;
+        _modifierDrowRange.enabled = false;
     }
 
     private void ConfigureCanvas(Canvas canvas, Camera targetCamera)

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using Zenject;
 
@@ -23,7 +24,7 @@ public class MoveSystem : MonoBehaviour
     private List<Unit> _availableUnits = new List<Unit>();  // Список доступных Персонажей для атаки
 
 
-    public Unit GetOldUnit () => _oldUnit; 
+    public Unit GetOldUnit() => _oldUnit;
 
     private void Awake()
     {
@@ -144,9 +145,59 @@ public class MoveSystem : MonoBehaviour
         SetMaterialCellAllowUnit();
     }
 
-    /// <summary>
-    /// Определяет и устанавливает доступные для хода клетки
-    /// </summary>
+    ///// <summary>
+    ///// Определяет и устанавливает доступные для хода клетки
+    ///// </summary>
+    //private void AllowCell()
+    //{
+    //    GetOldCell(_targetSelectedUnit);
+
+    //    if (_oldCell == null)
+    //    {
+    //        Debug.LogError("Текущая клетка не определена!");
+    //        return;
+    //    }
+
+    //    int x = _oldCell.LocalX;
+    //    int y = _oldCell.LocalY;
+
+    //    // Очищаем предыдущий список
+    //    _availableCells.Clear();
+
+    //    // Определяем шаблон перемещения "Звезда" с радиусом 3
+    //    for (int dx = -_targetSelectedUnit.MoveRange; dx <= _targetSelectedUnit.MoveRange; dx++)
+    //    {
+    //        for (int dy = -_targetSelectedUnit.MoveRange; dy <= _targetSelectedUnit.MoveRange; dy++)
+    //        {
+    //            // Пропускаем клетки за пределами радиуса
+    //            if (Mathf.Max(Mathf.Abs(dx), Mathf.Abs(dy)) > _targetSelectedUnit.MoveRange)
+    //                continue;
+
+    //            // Пропускаем центральную клетку
+    //            if (dx == 0 && dy == 0)
+    //                continue;
+
+    //            // Формируем "звездообразный" паттерн
+    //            if (Mathf.Abs(dx) + Mathf.Abs(dy) <= _targetSelectedUnit.MoveRange)
+    //            {
+    //                int targetX = x + dx;
+    //                int targetY = y + dy;
+
+    //                // Проверяем границы доски
+    //                if (targetX >= 0 && targetX < 8 && targetY >= 0 && targetY < 8)
+    //                {
+    //                    Cell cell = _allCell.GetCell(targetX, targetY);
+    //                    if (cell.CurrentUnit == null)
+    //                    {
+    //                        _availableCells.Add(cell);
+    //                    }
+    //                }
+    //            }
+    //        }
+    //    }
+    //}
+
+
     private void AllowCell()
     {
         GetOldCell(_targetSelectedUnit);
@@ -157,44 +208,96 @@ public class MoveSystem : MonoBehaviour
             return;
         }
 
-        int x = _oldCell.LocalX;
-        int y = _oldCell.LocalY;
-
-        // Очищаем предыдущий список
+        int startX = _oldCell.LocalX;
+        int startY = _oldCell.LocalY;
         _availableCells.Clear();
 
-        // Определяем шаблон перемещения "Звезда" с радиусом 3
-        for (int dx = -_targetSelectedUnit.MoveRange; dx <= _targetSelectedUnit.MoveRange; dx++)
+        // Генерация всех клеток в пределах максимальной дистанции
+        for (int targetX = 0; targetX < 8; targetX++)
         {
-            for (int dy = -_targetSelectedUnit.MoveRange; dy <= _targetSelectedUnit.MoveRange; dy++)
+            for (int targetY = 0; targetY < 8; targetY++)
             {
-                // Пропускаем клетки за пределами радиуса
-                if (Mathf.Max(Mathf.Abs(dx), Mathf.Abs(dy)) > _targetSelectedUnit.MoveRange)
-                    continue;
+                if (startX == targetX && startY == targetY) continue;
 
-                // Пропускаем центральную клетку
-                if (dx == 0 && dy == 0)
-                    continue;
-
-                // Формируем "звездообразный" паттерн
-                if (Mathf.Abs(dx) + Mathf.Abs(dy) <= _targetSelectedUnit.MoveRange)
+                // Проверка достижимости с учетом обходных путей
+                if (IsReachableWithObstacleAvoidance(startX, startY, targetX, targetY))
                 {
-                    int targetX = x + dx;
-                    int targetY = y + dy;
-
-                    // Проверяем границы доски
-                    if (targetX >= 0 && targetX < 8 && targetY >= 0 && targetY < 8)
+                    Cell cell = _allCell.GetCell(targetX, targetY);
+                    if (cell.CurrentUnit == null)
                     {
-                        Cell cell = _allCell.GetCell(targetX, targetY);
-                        if (cell.CurrentUnit == null)
-                        {
-                            _availableCells.Add(cell);
-                        }
+                        _availableCells.Add(cell);
                     }
                 }
             }
         }
     }
+
+    private bool IsReachableWithObstacleAvoidance(int startX, int startY, int targetX, int targetY)
+    {
+        Queue<Vector2Int> queue = new Queue<Vector2Int>();
+        Dictionary<Vector2Int, int> distances = new Dictionary<Vector2Int, int>();
+
+        Vector2Int start = new Vector2Int(startX, startY);
+        queue.Enqueue(start);
+        distances[start] = 0;
+
+        while (queue.Count > 0)
+        {
+            Vector2Int current = queue.Dequeue();
+
+            // Проверка цели
+            if (current.x == targetX && current.y == targetY)
+            {
+                return distances[current] <= _targetSelectedUnit.MoveRange;
+            }
+
+            // Получение только валидных соседей
+            foreach (var neighbor in GetOrthogonalNeighbors(current.x, current.y))
+            {
+                int newDistance = distances[current] + 1;
+
+                if (distances.ContainsKey(neighbor) || newDistance > _targetSelectedUnit.MoveRange)
+                    continue;
+
+                Cell cell = _allCell.GetCell(neighbor.x, neighbor.y);
+                if (cell == null || /*cell.IsBlocked ||*/ cell.CurrentUnit != null)
+                    continue;
+
+                distances[neighbor] = newDistance;
+                queue.Enqueue(neighbor);
+            }
+        }
+        return false;
+    }
+
+    private List<Vector2Int> GetOrthogonalNeighbors(int x, int y)
+    {
+        List<Vector2Int> validNeighbors = new List<Vector2Int>();
+
+        // Проверка каждой возможной клетки
+        void TryAddNeighbor(int checkX, int checkY)
+        {
+            if (IsValidCoordinate(checkX, checkY))
+            {
+                validNeighbors.Add(new Vector2Int(checkX, checkY));
+            }
+        }
+
+        TryAddNeighbor(x + 1, y);
+        TryAddNeighbor(x - 1, y);
+        TryAddNeighbor(x, y + 1);
+        TryAddNeighbor(x, y - 1);
+
+        return validNeighbors;
+    }
+
+    private bool IsValidCoordinate(int x, int y)
+    {
+        // Размер поля 8x8 по условию задачи
+        return x >= 0 && x < 8 && y >= 0 && y < 8;
+    }
+
+
 
     /// <summary>
     /// Включает подстветку доступных клеток для хода

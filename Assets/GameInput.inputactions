@@ -1,5 +1,5 @@
 {
-    "name": "GameImput",
+    "name": "GameInput",
     "maps": [
         {
             "name": "Game",
@@ -9,6 +9,15 @@
                     "name": "Restart",
                     "type": "Button",
                     "id": "fae20beb-dbf7-4a8e-be4f-1dc06dd3a749",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Menu",
+                    "type": "Button",
+                    "id": "d8c83e9d-5df8-43e4-9cba-b47626fbb55b",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -24,6 +33,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "Restart",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "514e181f-2922-42cc-a29c-1690a4de5713",
+                    "path": "<Keyboard>/escape",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Menu",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

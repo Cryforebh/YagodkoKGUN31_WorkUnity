@@ -15,7 +15,6 @@ public class SpawnUnitOnCell : MonoBehaviour
     private Camera _cameraPlayerOne;
     private Camera _cameraPlayerTwo;
 
-    // Как только создано будет меню с выбором этих элементов - убрать [SerializeField] !!!
     [SerializeField] private EnumTypeGame _typeGame;
     [SerializeField] private EnumPlayers _playerGoesFirst;
 
@@ -26,7 +25,7 @@ public class SpawnUnitOnCell : MonoBehaviour
 
         // Как только создано будет меню с выбором этих элементов - убрать !!!
         SetTypeGame(_typeGame);
-        SetWhoGoesFirst(_playerGoesFirst);
+        //SetWhoGoesFirst(_playerGoesFirst);
         //
 
         TypeGameCreate();

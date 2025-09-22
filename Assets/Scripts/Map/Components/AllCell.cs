@@ -41,4 +41,12 @@ public class AllCell : MonoBehaviour
         return null;
     }
     
+    public void SetModifierAllUnits(EnumModifier modifier, bool offAndOn, EnumPlayers players)
+    {
+        foreach (Cell cell in Cells)
+        {
+            if (cell.CurrentUnit != null && cell.CurrentUnit.Player == players)
+            cell.CurrentUnit.SetModifier(modifier, offAndOn);
+        }
+    }
 }

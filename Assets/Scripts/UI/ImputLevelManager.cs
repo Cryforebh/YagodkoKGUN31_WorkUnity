@@ -15,6 +15,8 @@ public class InputLevelManager : MonoBehaviour
     private GameInput _controls;
     private bool _isRestarting;
 
+    public GameInput Contlols => _controls;
+
     private void Awake()
     {
         _controls = new GameInput();

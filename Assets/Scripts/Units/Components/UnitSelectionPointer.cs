@@ -128,7 +128,8 @@ public class UnitSelectionPointer : MonoBehaviour, IPointerEnterHandler, IPointe
 
 
             // Курсор - Атака
-            _animatedCursor.SetCursorState(EnumStatusCursor.Attack);
+            if (_oldSelectedUnitStatic._unit.Class == EnumStatusUnitClass.Samurai) _animatedCursor.SetCursorState(EnumStatusCursor.Attack);
+            else _animatedCursor.SetCursorState(EnumStatusCursor.AttackDrow);
 
             _meshRenderer.material = _selectionMaterials.GetFocusMaterialEnemyUnit;
         }
