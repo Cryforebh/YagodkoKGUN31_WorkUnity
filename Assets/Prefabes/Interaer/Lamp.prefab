@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1462548579811307760}
   - component: {fileID: 1797187253702089055}
+  - component: {fileID: 956724297921731714}
   m_Layer: 0
   m_Name: PaperVisualLight
   m_TagString: Untagged
@@ -50,7 +51,7 @@ Light:
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
   m_Shadows:
-    m_Type: 0
+    m_Type: 1
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 1
@@ -94,6 +95,25 @@ Light:
   m_UseViewFrustumForShadowCasterCull: 1
   m_ShadowRadius: 0
   m_ShadowAngle: 0
+--- !u!114 &956724297921731714
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 460804902963550224}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f3fd08eeb1e1524b90a12338f5c87d8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _intensityMax: 0.1
+  _intensityMin: 0.2
+  _lightOne: {fileID: 0}
+  _lightTwo: {fileID: 0}
+  _isPositionRandom: 0
+  _positionMax: {x: 0, y: 0, z: 0}
+  _positionMin: {x: 0, y: 0, z: 0}
 --- !u!1 &8057722791948539159
 GameObject:
   m_ObjectHideFlags: 0
@@ -250,6 +270,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7780643646722819373}
   - component: {fileID: 6331554107187741616}
+  - component: {fileID: 3131058726725894982}
   m_Layer: 0
   m_Name: PaperVisualLight (1)
   m_TagString: Untagged
@@ -334,6 +355,25 @@ Light:
   m_UseViewFrustumForShadowCasterCull: 1
   m_ShadowRadius: 0
   m_ShadowAngle: 0
+--- !u!114 &3131058726725894982
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9177431644833252959}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f3fd08eeb1e1524b90a12338f5c87d8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _intensityMax: 0.1
+  _intensityMin: 0.2
+  _lightOne: {fileID: 0}
+  _lightTwo: {fileID: 0}
+  _isPositionRandom: 0
+  _positionMax: {x: 0, y: 0, z: 0}
+  _positionMin: {x: 0, y: 0, z: 0}
 --- !u!1001 &2550319387157548436
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -502,6 +542,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1412827137150407991, guid: 8990f5cdae36a1d49819ea16cc24f260, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2286860557525238047}
+    - targetCorrespondingSourceObject: {fileID: 1412827137150407991, guid: 8990f5cdae36a1d49819ea16cc24f260, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3306317694809171054}
   m_SourcePrefab: {fileID: 100100000, guid: 8990f5cdae36a1d49819ea16cc24f260, type: 3}
 --- !u!4 &2661122175958526591 stripped
 Transform:
@@ -526,7 +569,7 @@ Light:
   m_Shape: 0
   m_Color: {r: 1, g: 0.90357655, b: 0.48584908, a: 1}
   m_Intensity: 2.4
-  m_Range: 21.316166
+  m_Range: 12.853443
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
@@ -575,3 +618,22 @@ Light:
   m_UseViewFrustumForShadowCasterCull: 1
   m_ShadowRadius: 0
   m_ShadowAngle: 0
+--- !u!114 &3306317694809171054
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3530772852530780323}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f3fd08eeb1e1524b90a12338f5c87d8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _intensityMax: 0.1
+  _intensityMin: 0.2
+  _lightOne: {fileID: 0}
+  _lightTwo: {fileID: 0}
+  _isPositionRandom: 0
+  _positionMax: {x: 0, y: 0, z: 0}
+  _positionMin: {x: 0, y: 0, z: 0}

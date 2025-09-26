@@ -44,6 +44,42 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""HorrorHeadRight"",
+                    ""type"": ""Button"",
+                    ""id"": ""5e86feef-636c-4d90-a29e-dff3a1de0c6e"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""HorrorWelcom"",
+                    ""type"": ""Button"",
+                    ""id"": ""e3829ec8-04a8-4bb5-a595-2c265b7b72a3"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""HorrorHeadLeft"",
+                    ""type"": ""Button"",
+                    ""id"": ""62aedbc1-4b00-4628-a31b-51604899d5e6"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""HorrorHeadLong"",
+                    ""type"": ""Button"",
+                    ""id"": ""999c14cf-726f-4e22-99e1-888fb78b7b1c"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -68,6 +104,50 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
                     ""action"": ""Menu"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""3782a9be-c546-4d0f-b156-87b7cf712df4"",
+                    ""path"": ""<Keyboard>/numpad6"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""HorrorHeadRight"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""f3fdc01f-772a-467c-be0d-af14544c184a"",
+                    ""path"": ""<Keyboard>/numpad0"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""HorrorWelcom"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""2ccd403d-9542-40b6-8717-bee5b1522a87"",
+                    ""path"": ""<Keyboard>/numpad4"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""HorrorHeadLeft"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""abfcf45f-9d03-4fdd-ad7b-a364d475599b"",
+                    ""path"": ""<Keyboard>/numpad8"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""HorrorHeadLong"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -78,6 +158,10 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
         m_Game = asset.FindActionMap("Game", throwIfNotFound: true);
         m_Game_Restart = m_Game.FindAction("Restart", throwIfNotFound: true);
         m_Game_Menu = m_Game.FindAction("Menu", throwIfNotFound: true);
+        m_Game_HorrorHeadRight = m_Game.FindAction("HorrorHeadRight", throwIfNotFound: true);
+        m_Game_HorrorWelcom = m_Game.FindAction("HorrorWelcom", throwIfNotFound: true);
+        m_Game_HorrorHeadLeft = m_Game.FindAction("HorrorHeadLeft", throwIfNotFound: true);
+        m_Game_HorrorHeadLong = m_Game.FindAction("HorrorHeadLong", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -141,12 +225,20 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
     private List<IGameActions> m_GameActionsCallbackInterfaces = new List<IGameActions>();
     private readonly InputAction m_Game_Restart;
     private readonly InputAction m_Game_Menu;
+    private readonly InputAction m_Game_HorrorHeadRight;
+    private readonly InputAction m_Game_HorrorWelcom;
+    private readonly InputAction m_Game_HorrorHeadLeft;
+    private readonly InputAction m_Game_HorrorHeadLong;
     public struct GameActions
     {
         private @GameInput m_Wrapper;
         public GameActions(@GameInput wrapper) { m_Wrapper = wrapper; }
         public InputAction @Restart => m_Wrapper.m_Game_Restart;
         public InputAction @Menu => m_Wrapper.m_Game_Menu;
+        public InputAction @HorrorHeadRight => m_Wrapper.m_Game_HorrorHeadRight;
+        public InputAction @HorrorWelcom => m_Wrapper.m_Game_HorrorWelcom;
+        public InputAction @HorrorHeadLeft => m_Wrapper.m_Game_HorrorHeadLeft;
+        public InputAction @HorrorHeadLong => m_Wrapper.m_Game_HorrorHeadLong;
         public InputActionMap Get() { return m_Wrapper.m_Game; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -162,6 +254,18 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
             @Menu.started += instance.OnMenu;
             @Menu.performed += instance.OnMenu;
             @Menu.canceled += instance.OnMenu;
+            @HorrorHeadRight.started += instance.OnHorrorHeadRight;
+            @HorrorHeadRight.performed += instance.OnHorrorHeadRight;
+            @HorrorHeadRight.canceled += instance.OnHorrorHeadRight;
+            @HorrorWelcom.started += instance.OnHorrorWelcom;
+            @HorrorWelcom.performed += instance.OnHorrorWelcom;
+            @HorrorWelcom.canceled += instance.OnHorrorWelcom;
+            @HorrorHeadLeft.started += instance.OnHorrorHeadLeft;
+            @HorrorHeadLeft.performed += instance.OnHorrorHeadLeft;
+            @HorrorHeadLeft.canceled += instance.OnHorrorHeadLeft;
+            @HorrorHeadLong.started += instance.OnHorrorHeadLong;
+            @HorrorHeadLong.performed += instance.OnHorrorHeadLong;
+            @HorrorHeadLong.canceled += instance.OnHorrorHeadLong;
         }
 
         private void UnregisterCallbacks(IGameActions instance)
@@ -172,6 +276,18 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
             @Menu.started -= instance.OnMenu;
             @Menu.performed -= instance.OnMenu;
             @Menu.canceled -= instance.OnMenu;
+            @HorrorHeadRight.started -= instance.OnHorrorHeadRight;
+            @HorrorHeadRight.performed -= instance.OnHorrorHeadRight;
+            @HorrorHeadRight.canceled -= instance.OnHorrorHeadRight;
+            @HorrorWelcom.started -= instance.OnHorrorWelcom;
+            @HorrorWelcom.performed -= instance.OnHorrorWelcom;
+            @HorrorWelcom.canceled -= instance.OnHorrorWelcom;
+            @HorrorHeadLeft.started -= instance.OnHorrorHeadLeft;
+            @HorrorHeadLeft.performed -= instance.OnHorrorHeadLeft;
+            @HorrorHeadLeft.canceled -= instance.OnHorrorHeadLeft;
+            @HorrorHeadLong.started -= instance.OnHorrorHeadLong;
+            @HorrorHeadLong.performed -= instance.OnHorrorHeadLong;
+            @HorrorHeadLong.canceled -= instance.OnHorrorHeadLong;
         }
 
         public void RemoveCallbacks(IGameActions instance)
@@ -193,5 +309,9 @@ public partial class @GameInput: IInputActionCollection2, IDisposable
     {
         void OnRestart(InputAction.CallbackContext context);
         void OnMenu(InputAction.CallbackContext context);
+        void OnHorrorHeadRight(InputAction.CallbackContext context);
+        void OnHorrorWelcom(InputAction.CallbackContext context);
+        void OnHorrorHeadLeft(InputAction.CallbackContext context);
+        void OnHorrorHeadLong(InputAction.CallbackContext context);
     }
 }

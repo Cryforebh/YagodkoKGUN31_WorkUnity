@@ -1,0 +1,94 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &7109986626904746194
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2142908306143668079}
+  - component: {fileID: 756846732085824621}
+  m_Layer: 0
+  m_Name: CursorManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2142908306143668079
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7109986626904746194}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &756846732085824621
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7109986626904746194}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf70ea7277f65254399b045bc6055f8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cursorStates:
+  - stateType: 0
+    frames:
+    - {fileID: 2800000, guid: d41d1f064dfaffe45b0c86cfcf6cebff, type: 3}
+    hotspot: {x: 50, y: 50}
+    frameRate: 0.15
+    animationType: 0
+  - stateType: 1
+    frames:
+    - {fileID: 2800000, guid: d41d1f064dfaffe45b0c86cfcf6cebff, type: 3}
+    - {fileID: 2800000, guid: a2c2ea02201186345bfe033825a5ae26, type: 3}
+    - {fileID: 2800000, guid: 77ae45595420a4241970b40e03a557cb, type: 3}
+    - {fileID: 2800000, guid: a2c2ea02201186345bfe033825a5ae26, type: 3}
+    hotspot: {x: 50, y: 50}
+    frameRate: 0.15
+    animationType: 1
+  - stateType: 2
+    frames:
+    - {fileID: 2800000, guid: bcf75accc6848b34fb5b5a13fc61253a, type: 3}
+    - {fileID: 2800000, guid: fcdf5bd9ba7e87c4ebb499647ad913cb, type: 3}
+    - {fileID: 2800000, guid: 2faf562d67fc1d847952a1656dbab29e, type: 3}
+    - {fileID: 2800000, guid: 7f0cefcd81ee2384099c6e787d19622a, type: 3}
+    - {fileID: 2800000, guid: a381fbc01da859a46b19bd27a7ed88bb, type: 3}
+    hotspot: {x: 50, y: 50}
+    frameRate: 0.15
+    animationType: 1
+  - stateType: 4
+    frames:
+    - {fileID: 2800000, guid: a880b3c131cdd8d41b4235087f1f2fc9, type: 3}
+    - {fileID: 2800000, guid: 726b0e15353ac954f9275e6b1f34b8a6, type: 3}
+    - {fileID: 2800000, guid: b82af2fb1e63af740ada34e5dd4ceac0, type: 3}
+    - {fileID: 2800000, guid: 4b92e76707c1ee44dbd7083117814dca, type: 3}
+    hotspot: {x: 50, y: 50}
+    frameRate: 0.15
+    animationType: 1
+  - stateType: 3
+    frames:
+    - {fileID: 2800000, guid: b62f2339d07e0e040aa63e5514c3fbda, type: 3}
+    - {fileID: 2800000, guid: 148667e2cb35b7944be265d8cbe6de0f, type: 3}
+    - {fileID: 2800000, guid: 7bbe79cb1f9164740893efe8bbd61288, type: 3}
+    - {fileID: 2800000, guid: 706dfa89d354fa54d9c829b7ff60cbfd, type: 3}
+    - {fileID: 2800000, guid: 840d983646c38884195b438a85d8a58c, type: 3}
+    - {fileID: 2800000, guid: 3d65cf379711b3f4281fbb8306ce359f, type: 3}
+    hotspot: {x: 50, y: 50}
+    frameRate: 0.15
+    animationType: 1
+  _initialState: 0
+  _enableLogs: 0

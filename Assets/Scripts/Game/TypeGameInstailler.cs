@@ -11,7 +11,7 @@ public class TypeGameInstailler : MonoInstaller
     public override void InstallBindings()
     {
         Container.Bind<TypeGameManager>()
-            .FromComponentInNewPrefab(_typeGameManager)
+            .FromInstance(_typeGameManager)
             .AsSingle()
             .NonLazy();
     }

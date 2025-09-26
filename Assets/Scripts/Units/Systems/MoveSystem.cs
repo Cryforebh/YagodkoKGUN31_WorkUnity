@@ -197,6 +197,10 @@ public class MoveSystem : MonoBehaviour
     //    }
     //}
 
+    public void AllowCellForce()
+    {
+        AllowCell();
+    }
 
     private void AllowCell()
     {

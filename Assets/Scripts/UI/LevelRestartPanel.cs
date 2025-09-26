@@ -7,16 +7,22 @@ using Zenject;
 
 public class LevelRestartPanel : MonoBehaviour
 {
+    [SerializeField] private Image _backGround;
     [SerializeField] private Image _fillImage;
     [SerializeField] private float _fillSpeed = 0.5f;
 
     public float fillAmount { get; private set; }
 
-    public void ShowPanel() => gameObject.SetActive(true);
+    public void ShowPanel() 
+    {
+        gameObject.SetActive(true);
+        _backGround.enabled = true;
+    } 
     
     public void HidePanel()
     {
         gameObject.SetActive(false);
+        _backGround.enabled = false;
         fillAmount = 0f;
         _fillImage.fillAmount = 0f;
     }
@@ -31,5 +37,6 @@ public class LevelRestartPanel : MonoBehaviour
     {
         _fillImage = gameObject.GetComponent<Image>();
         _fillImage.fillAmount = 0f;
+        _backGround.enabled = false;
     }
 }

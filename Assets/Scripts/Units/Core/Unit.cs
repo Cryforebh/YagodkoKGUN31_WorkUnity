@@ -8,6 +8,7 @@ using Zenject;
 public abstract class Unit : MonoBehaviour
 {
     [Inject] private AllPlayer _allPlayer;
+    [Inject] private SoundManager _soundManager;
 
     private Vector3 _position;
     private float _baseHealth = 15f;
@@ -196,11 +197,20 @@ public abstract class Unit : MonoBehaviour
         // 3. Ждать заданное время
         yield return new WaitForSeconds(_deathDelay);
 
-        Debug.Log($"{this.name}: Умер окончательно!");
 
-        enabled = false;
+
+        foreach (var objChild in gameObject.GetComponentsInChildren<MeshRenderer>())
+        {
+            objChild.enabled = false;
+        }
+
+        // 3. Ждать заданное время
+        yield return new WaitForSeconds(0.5f);
+
+        Debug.Log($"{this.name}: Умер окончательно!");
+        //enabled = false;
         gameObject.SetActive(false);
-        this.IsDestroyed();
+        //this.IsDestroyed();
 
         // 4. Окончательные действия (например, исчезновение)
         //Destroy(gameObject); // Или gameObject.SetActive(false);
@@ -214,5 +224,10 @@ public abstract class Unit : MonoBehaviour
     public Unit GetUnit()
     {
         return this;
+    }
+
+    public void OnDelete()
+    {
+        Destroy(gameObject);
     }
 }

@@ -11,6 +11,7 @@ public class MainInstaller : MonoInstaller
     [SerializeField] private InputLevelManager _inputManager;
     [SerializeField] private ContainerStatusGame _containerStatusGame;
     [SerializeField] private MoveSystem _moveSystem;
+    //[SerializeField] private SoundManager _soundManager;
 
     public override void InstallBindings()
     {
@@ -23,5 +24,6 @@ public class MainInstaller : MonoInstaller
         Container.Bind<InputLevelManager>().FromInstance(_inputManager).AsSingle().NonLazy();
         Container.Bind<ContainerStatusGame>().FromInstance(_containerStatusGame).AsSingle().NonLazy();
         Container.Bind<MoveSystem>().FromInstance(_moveSystem).AsSingle().NonLazy();
+        //Container.Bind<SoundManager>().FromInstance(_soundManager).AsSingle().NonLazy();
     }
 }

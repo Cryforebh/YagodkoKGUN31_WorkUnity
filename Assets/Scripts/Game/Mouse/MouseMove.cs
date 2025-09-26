@@ -1,4 +1,5 @@
 using UnityEngine;
+using Zenject;
 
 public class MouseMove : MonoBehaviour
 {
@@ -20,7 +21,10 @@ public class MouseMove : MonoBehaviour
 
     private float _currentTimeOutOnReturn;
 
-    void Start()
+    private bool _isRun = false;
+    private MenuToggleManager _menuToggleManager;
+
+    private void Start()
     {
         // Сохраняем начальное положение камеры
         _initialRotation = transform.localEulerAngles;
@@ -28,8 +32,15 @@ public class MouseMove : MonoBehaviour
         _currentTimeOutOnReturn = _timeOutOnReturn;
     }
 
-    void Update()
+    private void Update()
     {
+        _isRun = _menuToggleManager.DynamicCamera;
+        if (_isRun == false) 
+        {
+            transform.localEulerAngles = _initialRotation;
+            return;
+        }
+
         HandleMouseInput();
         ApplyInertia();
         ApplyRotation();
@@ -123,5 +134,11 @@ public class MouseMove : MonoBehaviour
             new Vector3(clampedX, clampedY, current.z),
             Time.deltaTime * 5f
         );
+    }
+
+    [Inject]
+    private void GetMenuToggleManager (MenuToggleManager menuToggleManager)
+    {
+        _menuToggleManager = menuToggleManager;
     }
 }

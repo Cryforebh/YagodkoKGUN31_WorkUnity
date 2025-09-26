@@ -275,6 +275,7 @@ GameObject:
   - component: {fileID: 8698033431233449475}
   - component: {fileID: 1173158566619381890}
   - component: {fileID: 4741205158404131067}
+  - component: {fileID: 9132398426441372415}
   - component: {fileID: 3245295293981286165}
   m_Layer: 6
   m_Name: Ranger
@@ -385,6 +386,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b78c7a5787bc818429a820dd6b2d248d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &9132398426441372415
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7993504197637664289}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c950a924feb53ee438209993fd0fb3aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _soundsType: 1
 --- !u!82 &3245295293981286165
 AudioSource:
   m_ObjectHideFlags: 0

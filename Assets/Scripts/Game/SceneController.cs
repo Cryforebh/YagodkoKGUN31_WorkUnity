@@ -21,4 +21,14 @@ public class SceneController : MonoBehaviour
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
+
+    public void ExitOfMainMenu()
+    {
+        SceneManager.LoadScene(0);
+    }
+
+    public void EnterPlayGame()
+    {
+        SceneManager.LoadScene(1);
+    }
 }

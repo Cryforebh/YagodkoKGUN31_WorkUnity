@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class BoomEffectController : MonoBehaviour
 {
+    [SerializeField] private Camera m_Camera;
+
     [Header("Настройки взрыва")]
     [SerializeField] private Sprite[] _explosionSprites; // Массив спрайтов анимации
     [SerializeField] private float _frameDuration = 0.05f; // Длительность одного кадра
@@ -25,7 +27,7 @@ public class BoomEffectController : MonoBehaviour
 
     private void InitializeComponents()
     {
-        _mainCamera = Camera.main.transform;
+        _mainCamera = m_Camera.transform;
         GameObject explosionObject = new GameObject("ExplosionSprite");
         explosionObject.transform.SetParent(transform);
 

@@ -6,7 +6,15 @@ using Zenject;
 
 public class EnterButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
-    [Inject] AdvancedCursorController _cursor;
+    [Inject] private AdvancedCursorController _cursor;
+
+    private void Start()
+    {
+        if (_cursor == null)
+        {
+            Debug.LogError("Cursor не назначен! Проверьте привязки Zenject.");
+        }
+    }
 
     public void OnPointerEnter(PointerEventData eventData)
     {

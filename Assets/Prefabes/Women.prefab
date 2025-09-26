@@ -104,6 +104,9 @@ PrefabInstance:
       addedObject: {fileID: 3912835381930444358}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: efc1ea1ae2e5b074491ec610ac0aac65, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 6431551028779384551}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: efc1ea1ae2e5b074491ec610ac0aac65, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 6368445685519508910}
   m_SourcePrefab: {fileID: 100100000, guid: efc1ea1ae2e5b074491ec610ac0aac65, type: 3}
 --- !u!1 &248153052870914496 stripped
@@ -146,10 +149,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe0e7bca63404ef46ae0690cf4ee6d87, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _audioClip:
-  - {fileID: 8300000, guid: 8cc10a7a8fa2e764a813383281cd6d9d, type: 3}
-  - {fileID: 8300000, guid: 2eb7a48acdc5b6d43a64cd35f01770af, type: 3}
-  - {fileID: 8300000, guid: 1674e1358ed37b14880899fd0101242a, type: 3}
+  _soundStartActive: []
+  _cursorSelect: 0
+  _deleteThisObject: 0
+  _deleteLocalObject: 0
+  _LocalObjectDelete: {fileID: 0}
+  _turnBacklight: 0
+  _objectRenderer: {fileID: 0}
+  _selectMaterial: {fileID: 0}
+  _modifier: 0
+  _modifireDelay: 10
+  _endModifireAudioClip: {fileID: 0}
+  _playerAddiction: 0
+  _player: 0
+  _countActive: 1
+  _noActive: {fileID: 0}
+--- !u!114 &6431551028779384551
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 248153052870914496}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c950a924feb53ee438209993fd0fb3aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _soundsType: 4
 --- !u!82 &6368445685519508910
 AudioSource:
   m_ObjectHideFlags: 0

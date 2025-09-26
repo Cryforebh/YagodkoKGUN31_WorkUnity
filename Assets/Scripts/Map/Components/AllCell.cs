@@ -5,8 +5,6 @@ using UnityEngine;
 
 public class AllCell : MonoBehaviour
 {
-    //public List<Cell> cells;
-    //[Tooltip("Не используется! Создан для отображения нижнего массива!")] public List<Cell> Vision;
     private Cell[,] CellsMassiv = new Cell[8, 8];
 
     public Cell[,] Cells => CellsMassiv;
