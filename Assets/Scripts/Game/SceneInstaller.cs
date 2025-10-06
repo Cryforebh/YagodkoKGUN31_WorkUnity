@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
 
@@ -15,5 +13,5 @@ public class SceneInstaller : MonoInstaller
         Container.Bind<SceneController>().FromInstance(_sceneController).AsSingle().NonLazy();
         Container.Bind<InputManager>().FromInstance(_inputManager).AsSingle().NonLazy();
     }
-      
+
 }

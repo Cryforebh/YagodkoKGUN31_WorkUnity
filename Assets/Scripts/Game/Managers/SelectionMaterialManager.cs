@@ -1,6 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class SelectionMaterialManager : MonoBehaviour
@@ -32,5 +29,5 @@ public class SelectionMaterialManager : MonoBehaviour
                 Debug.LogError($"{player} - не найден! Присвоен материал Игрока номер 1 !");
                 return _playerOne;
         }
-    } 
+    }
 }

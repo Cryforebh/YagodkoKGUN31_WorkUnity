@@ -105,7 +105,7 @@ public class LightPhisicRandom : MonoBehaviour
             _intensityRandom = Random.Range(0.5f, 1.1f);
         }
 
-        
-       
+
+
     }
 }

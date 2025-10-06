@@ -9,6 +9,8 @@ public class PlayerManager : MonoBehaviour
 {
     [Inject] private AllPlayer _players;
     [Inject] private TypeGameManager _gameManager;
+    [Inject] private ContainerStatusGame _statusGame;
+    [Inject] private GameData _gameData;
 
     private EnumPlayers _activePlayer = EnumPlayers.None;
 
@@ -16,10 +18,8 @@ public class PlayerManager : MonoBehaviour
     public event Action<EnumPlayers> OnWinnerDeclared; // Событие Победы
 
     [SerializeField] private Camera _cameraPlayerOne;
-    [SerializeField] private Camera _cameraPlayerTwo;
 
     [SerializeField] private WinImage _winImagePlayerOne;
-    [SerializeField] private WinImage _winImagePlayerTwo;
 
 
     public EnumPlayers ActivePlayer
@@ -49,7 +49,54 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Проверка на победителя (Если он есть)
+    /// </summary>
+    /// <returns></returns>
     public EnumPlayers? CheckWinner()
+    {
+        // Фильтруем игроков с юнитами, исключая None
+        var activePlayers = GetPlayersWhithUnits();
+
+        if (activePlayers.Count == 0)
+        {
+            _gameData.Lock = true;
+            _gameData.LockClick = true;
+
+            Debug.Log("Все игроки уничтожены! Ничья!");
+            OnWinnerDeclared?.Invoke(EnumPlayers.None);
+            _winImagePlayerOne.Show(EnumPlayers.None);
+
+            return EnumPlayers.None;
+        }
+        else if (activePlayers.Count == 1)
+        {
+            _gameData.Lock = true;
+            _gameData.LockClick = true;
+
+            Debug.Log($"Победитель: {activePlayers[0]}!");
+            OnWinnerDeclared?.Invoke(activePlayers[0]);
+            _winImagePlayerOne.Show(activePlayers[0]);
+
+            return activePlayers[0];
+        }
+
+        return null;
+    }
+
+    public Camera GetCameraPlayer(EnumPlayers player)
+    {
+        switch (player)
+        {
+            case EnumPlayers.PlayerOne:
+                return _cameraPlayerOne;
+            default:
+                Debug.LogError("Назначен не существующий Игрок!");
+                return null;
+        }
+    }
+
+    public List<EnumPlayers> GetPlayersWhithUnits()
     {
         // Фильтруем игроков с юнитами, исключая None
         var activePlayers = _players.PlayersCollection
@@ -57,50 +104,44 @@ public class PlayerManager : MonoBehaviour
             .Select(p => p.Key)
             .ToList();
 
-        if (activePlayers.Count == 0)
-        {
-            Debug.Log("Все игроки уничтожены! Ничья!");
-            OnWinnerDeclared?.Invoke(EnumPlayers.None);
-            _winImagePlayerOne.Show(EnumPlayers.None);
-            _winImagePlayerTwo.Show(EnumPlayers.None);
-            return EnumPlayers.None;
-        }
-        else if (activePlayers.Count == 1)
-        {
-            Debug.Log($"Победитель: {activePlayers[0]}!");
-            OnWinnerDeclared?.Invoke(activePlayers[0]);
-            _winImagePlayerOne.Show(activePlayers[0]);
-            _winImagePlayerTwo.Show(activePlayers[0]);
-            return activePlayers[0];
-        }
-
-        return null;
-    }
-    
-    public Camera GetCameraPlayer(EnumPlayers player)
-    {
-        switch (player)
-        {
-            case EnumPlayers.None:
-                Debug.LogError($"У этого {player} - Нет камеры!");
-                return null;
-            case EnumPlayers.PlayerOne:
-                return _cameraPlayerOne;
-            case EnumPlayers.PlayerTwo:
-                return _cameraPlayerTwo;
-            case EnumPlayers.PlayerThree:
-                Debug.LogError($"У этого {player} - Нет камеры!");
-                return null;
-            default:
-                Debug.LogError("Назначен не существующий Игрок!");
-                return null;
-        }
+        return activePlayers;
     }
 
-    private void Start()
+    /// <summary>
+    /// Смена игрока
+    /// </summary>
+    public void ChangePlayer()
     {
-        //// Стартовый активный игрок (пример)
-        //ActivePlayer = EnumPlayers.PlayerTwo;
-        //Debug.Log($"Стартовый персонаж назначен - это {ActivePlayer}!");
+        _gameData.LockClick = true;
+
+        if (GetPlayersWhithUnits().Count < 2) return;
+
+        StartCoroutine(TimeOutForLockAndChange());
+        StartCoroutine(ProcessChangePlayer());
+    }
+
+    private IEnumerator ProcessChangePlayer()
+    {
+        yield return new WaitForSeconds(1.5f);
+
+        _statusGame.StatusUpdate(EnumStatusGame.Empty);
+        _gameData.Lock = false;
+        _gameData.LockClick = false;
+    }
+
+    private IEnumerator TimeOutForLockAndChange()
+    {
+        yield return new WaitForSeconds(0.4f);
+
+        _gameData.Lock = true;
+
+        if (ActivePlayer == EnumPlayers.PlayerTwo)
+        {
+            ActivePlayer = EnumPlayers.PlayerOne;
+        }
+        else if (ActivePlayer == EnumPlayers.PlayerOne)
+        {
+            ActivePlayer = EnumPlayers.PlayerTwo;
+        }
     }
 }

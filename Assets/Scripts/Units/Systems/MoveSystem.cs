@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.IO;
 using UnityEngine;
 using Zenject;
 
@@ -10,6 +9,8 @@ public class MoveSystem : MonoBehaviour
     [Inject] private PlayerManager _playerManager;
     [Inject] private SoundsUnit _soundUnit;
     [Inject] private BoomEffectController _explosionController;
+
+    private SignalBus _statusGameSignal;
 
     //[SerializeField] private Camera _cameraMain;
     [SerializeField] private GameObject _cameraOne;
@@ -30,6 +31,12 @@ public class MoveSystem : MonoBehaviour
     {
         _statusGame.OnStatusChanged += HandleStatusChange;
         _playerManager.OnWinnerDeclared += HandleGameEnd;
+    }
+
+    [Inject]
+    private void Construct(SignalBus status)
+    {
+        _statusGameSignal = status;
     }
 
     private void OnDestroy()
@@ -91,8 +98,6 @@ public class MoveSystem : MonoBehaviour
         if (_targetSelectedUnit) GetOldCell(_targetSelectedUnit);               // Получаем клетку на которой стоял персонаж, который совершил действие
     }
 
-    //public void SetSoundUnit(SoundsUnit soundsUnit) => _soundUnit = soundsUnit; 
-
     /// <summary>
     /// Проверяет, является ли клетка одной из доступных для хода
     /// </summary>
@@ -144,58 +149,6 @@ public class MoveSystem : MonoBehaviour
         AllowAttackUnits();
         SetMaterialCellAllowUnit();
     }
-
-    ///// <summary>
-    ///// Определяет и устанавливает доступные для хода клетки
-    ///// </summary>
-    //private void AllowCell()
-    //{
-    //    GetOldCell(_targetSelectedUnit);
-
-    //    if (_oldCell == null)
-    //    {
-    //        Debug.LogError("Текущая клетка не определена!");
-    //        return;
-    //    }
-
-    //    int x = _oldCell.LocalX;
-    //    int y = _oldCell.LocalY;
-
-    //    // Очищаем предыдущий список
-    //    _availableCells.Clear();
-
-    //    // Определяем шаблон перемещения "Звезда" с радиусом 3
-    //    for (int dx = -_targetSelectedUnit.MoveRange; dx <= _targetSelectedUnit.MoveRange; dx++)
-    //    {
-    //        for (int dy = -_targetSelectedUnit.MoveRange; dy <= _targetSelectedUnit.MoveRange; dy++)
-    //        {
-    //            // Пропускаем клетки за пределами радиуса
-    //            if (Mathf.Max(Mathf.Abs(dx), Mathf.Abs(dy)) > _targetSelectedUnit.MoveRange)
-    //                continue;
-
-    //            // Пропускаем центральную клетку
-    //            if (dx == 0 && dy == 0)
-    //                continue;
-
-    //            // Формируем "звездообразный" паттерн
-    //            if (Mathf.Abs(dx) + Mathf.Abs(dy) <= _targetSelectedUnit.MoveRange)
-    //            {
-    //                int targetX = x + dx;
-    //                int targetY = y + dy;
-
-    //                // Проверяем границы доски
-    //                if (targetX >= 0 && targetX < 8 && targetY >= 0 && targetY < 8)
-    //                {
-    //                    Cell cell = _allCell.GetCell(targetX, targetY);
-    //                    if (cell.CurrentUnit == null)
-    //                    {
-    //                        _availableCells.Add(cell);
-    //                    }
-    //                }
-    //            }
-    //        }
-    //    }
-    //}
 
     public void AllowCellForce()
     {
@@ -393,9 +346,11 @@ public class MoveSystem : MonoBehaviour
         UpdateCellOwnership(_targetSelectedUnit, _targetActionCell);
 
         // Смена игрока
-        ChangePlayer();
+        _playerManager.ChangePlayer();
 
-        _statusGame.StatusUpdate(EnumStatusGame.Empty);
+        //_statusGame.StatusUpdate(EnumStatusGame.Empty);
+
+        _statusGameSignal.Fire(StatusGameSignal.Return);
     }
 
     /// <summary>
@@ -409,10 +364,6 @@ public class MoveSystem : MonoBehaviour
             Debug.LogError("Не выбраны юнит или цель для атаки!");
             return;
         }
-
-        //// Поиск клеток
-        //Cell attackerCell = GetOldCell(_targetSelectedUnit);
-        //Cell targetCell = _allCell.GetCellOnUnit(_targetActionUnit);
 
         if (_oldCell == null || _targetActionCell == null)
         {
@@ -468,9 +419,11 @@ public class MoveSystem : MonoBehaviour
         // Определение победителя если остался единственный игрок с юнитами.
         _playerManager.CheckWinner();
 
-        ChangePlayer();
+        _playerManager.ChangePlayer();
 
-        _statusGame.StatusUpdate(EnumStatusGame.Empty);
+        //_statusGame.StatusUpdate(EnumStatusGame.Empty);
+
+        _statusGameSignal.Fire(StatusGameSignal.Return);
     }
 
     // Обновляет данные клеток с которыми совершались какие-то взаимодействия
@@ -539,22 +492,6 @@ public class MoveSystem : MonoBehaviour
         {
             Debug.LogWarning($"ИГРА ОКОНЧЕНА! ПОБЕДИТЕЛЬ: {winner}");
             // Остановка игры, показ UI и т.д.
-        }
-    }
-
-    private void ChangePlayer()
-    {
-        if (_playerManager.ActivePlayer == EnumPlayers.PlayerTwo)
-        {
-            //_cameraOne.SetActive(true);
-            //_cameraTwo.SetActive(false);
-            _playerManager.ActivePlayer = EnumPlayers.PlayerOne;
-        }
-        else if (_playerManager.ActivePlayer == EnumPlayers.PlayerOne)
-        {
-            //_cameraOne.SetActive(false);
-            //_cameraTwo.SetActive(true);
-            _playerManager.ActivePlayer = EnumPlayers.PlayerTwo;
         }
     }
 }

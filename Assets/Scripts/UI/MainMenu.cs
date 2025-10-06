@@ -1,6 +1,6 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Zenject;
 
@@ -13,10 +13,10 @@ public class MainMenu : MonoBehaviour
 
     [Header("Все окна меню")]
     [SerializeField] private GameObject _menu;
-    [SerializeField] private GameObject _manual;
-    [SerializeField] private GameObject _manualUnits;
-    [SerializeField] private GameObject _manualModifi;
-    [SerializeField] private GameObject _manualEat;
+    //[SerializeField] private GameObject _manual;
+    //[SerializeField] private GameObject _manualUnits;
+    //[SerializeField] private GameObject _manualModifi;
+    //[SerializeField] private GameObject _manualEat;
     [SerializeField] private GameObject _seting;
     [SerializeField] private GameObject _quality;
     [SerializeField] private GameObject _sounds;
@@ -54,10 +54,10 @@ public class MainMenu : MonoBehaviour
 
     private void HideAllLocalWindows()
     {
-        _manual.SetActive(false);
-        _manualUnits.SetActive(false);
-        _manualModifi.SetActive(false);
-        _manualEat.SetActive(false);
+        //_manual.SetActive(false);
+        //_manualUnits.SetActive(false);
+        //_manualModifi.SetActive(false);
+        //_manualEat.SetActive(false);
         _seting.SetActive(false);
         _quality.SetActive(false);
         _sounds.SetActive(false);
@@ -92,53 +92,53 @@ public class MainMenu : MonoBehaviour
 
         MenuHide();
 
-        _manual.SetActive(true);
-        _manualUnits.SetActive(true);
+        //_manual.SetActive(true);
+        //_manualUnits.SetActive(true);
     }
 
-    public void ButtonManualLeft()
-    {
-        if (_manualUnits.activeSelf == true)
-        {
-            _manualUnits.SetActive(false);
-            _manualEat.SetActive(true);
-            return;
-        }
-        else if (_manualEat.activeSelf == true)
-        {
-            _manualEat.SetActive(false);
-            _manualModifi.SetActive(true);
-            return;
-        }
-        else if (_manualModifi.activeSelf == true)
-        {
-            _manualModifi.SetActive(false);
-            _manualUnits.SetActive(true);
-            return;
-        }
-    }
+    //public void ButtonManualLeft()
+    //{
+    //    if (_manualUnits.activeSelf == true)
+    //    {
+    //        _manualUnits.SetActive(false);
+    //        _manualEat.SetActive(true);
+    //        return;
+    //    }
+    //    else if (_manualEat.activeSelf == true)
+    //    {
+    //        _manualEat.SetActive(false);
+    //        _manualModifi.SetActive(true);
+    //        return;
+    //    }
+    //    else if (_manualModifi.activeSelf == true)
+    //    {
+    //        _manualModifi.SetActive(false);
+    //        _manualUnits.SetActive(true);
+    //        return;
+    //    }
+    //}
 
-    public void ButtonManualRight()
-    {
-        if (_manualUnits.activeSelf == true)
-        {
-            _manualUnits.SetActive(false);
-            _manualModifi.SetActive(true);
-            return;
-        }
-        else if (_manualModifi.activeSelf == true)
-        {
-            _manualModifi.SetActive(false);
-            _manualEat.SetActive(true);
-            return;
-        }
-        else if (_manualEat.activeSelf == true)
-        {
-            _manualEat.SetActive(false);
-            _manualUnits.SetActive(true);
-            return;
-        }
-    }
+    //public void ButtonManualRight()
+    //{
+    //    if (_manualUnits.activeSelf == true)
+    //    {
+    //        _manualUnits.SetActive(false);
+    //        _manualModifi.SetActive(true);
+    //        return;
+    //    }
+    //    else if (_manualModifi.activeSelf == true)
+    //    {
+    //        _manualModifi.SetActive(false);
+    //        _manualEat.SetActive(true);
+    //        return;
+    //    }
+    //    else if (_manualEat.activeSelf == true)
+    //    {
+    //        _manualEat.SetActive(false);
+    //        _manualUnits.SetActive(true);
+    //        return;
+    //    }
+    //}
 
     public void ButtonSettingShow()
     {
@@ -237,6 +237,11 @@ public class MainMenu : MonoBehaviour
         _menuToggleManager.MadnessMode = toggle.isOn;
     }
 
+    public void ToggleImmersiveObjects(Toggle toggle)
+    {
+        _menuToggleManager.ImmersiveObjects = toggle.isOn;
+    }
+
     //--------------------------
 
     public void ButtonPlayGame()
@@ -245,7 +250,9 @@ public class MainMenu : MonoBehaviour
 
         _isSelectPlay = true;
         _fadeController.Out();
-        StartCoroutine(PlayFadeShow(1));
+        _sceneController.EnterPlayGame();
+        //StartCoroutine(PlayFadeShow(1));
+        //StartCoroutine(LoadAsync(1, 1));
     }
 
     private void OnDestroy()
@@ -257,5 +264,23 @@ public class MainMenu : MonoBehaviour
     {
         yield return new WaitForSeconds(timeOut);
         _sceneController.EnterPlayGame();
+    }
+
+    private IEnumerator LoadAsync(int sceneIndex, float timeOut)
+    {
+        AsyncOperation operation = SceneManager.LoadSceneAsync(sceneIndex);
+        operation.allowSceneActivation = false; // Запрещаем авто-переход
+
+        yield return new WaitForSeconds(timeOut);
+
+        while (!operation.isDone)
+        {
+            if (operation.progress >= 0.9f)
+            {
+                operation.allowSceneActivation = true; // Разрешаем переход
+            }
+
+            yield return null;
+        }
     }
 }

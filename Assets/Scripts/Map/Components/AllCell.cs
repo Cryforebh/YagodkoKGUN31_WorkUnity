@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
 using UnityEngine;
 
 public class AllCell : MonoBehaviour
@@ -9,7 +6,7 @@ public class AllCell : MonoBehaviour
 
     public Cell[,] Cells => CellsMassiv;
 
-    public void SetCell(Cell cell, int x, int y) 
+    public void SetCell(Cell cell, int x, int y)
     {
         CellsMassiv[x, y] = cell;
     }
@@ -38,13 +35,13 @@ public class AllCell : MonoBehaviour
         Debug.LogWarning($"В Процессе запроса клетки которой пренадлежит {unit.name} в классе AllCell, произошла ошибка, этот юнит не принадлежит не одной из клеток.");
         return null;
     }
-    
+
     public void SetModifierAllUnits(EnumModifier modifier, bool offAndOn, EnumPlayers players)
     {
         foreach (Cell cell in Cells)
         {
             if (cell.CurrentUnit != null && cell.CurrentUnit.Player == players)
-            cell.CurrentUnit.SetModifier(modifier, offAndOn);
+                cell.CurrentUnit.SetModifier(modifier, offAndOn);
         }
     }
 }

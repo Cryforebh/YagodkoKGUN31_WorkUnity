@@ -41,7 +41,6 @@ public class MenuInGame : MonoBehaviour/*, IPointerEnterHandler, IPointerExitHan
 
     private bool _isSelectedFirstPlayer = true;
     private bool _isEbdSelectedPlayer = false;
-    //private static bool _isOnePlay = false;
 
     private void Awake()
     {
@@ -308,6 +307,11 @@ public class MenuInGame : MonoBehaviour/*, IPointerEnterHandler, IPointerExitHan
         _menuToggleManager.MadnessMode = toggle.isOn;
     }
 
+    public void ToggleImmersiveObjects(Toggle toggle)
+    {
+        _menuToggleManager.ImmersiveObjects = toggle.isOn;
+    }
+
     ////////////////////////////////////////////
 
     public void SelectedFirstPlayerShow()
@@ -356,7 +360,6 @@ public class MenuInGame : MonoBehaviour/*, IPointerEnterHandler, IPointerExitHan
         CameraMenuShow(false);
         _fadeControllerG.Show();
 
-        _isEbdSelectedPlayer = true; 
+        _isEbdSelectedPlayer = true;
     }
 }
-    

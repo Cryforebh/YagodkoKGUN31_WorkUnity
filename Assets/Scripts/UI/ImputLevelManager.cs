@@ -1,10 +1,5 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.InputSystem;
-using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 using Zenject;
 
 public class InputLevelManager : MonoBehaviour
@@ -20,7 +15,7 @@ public class InputLevelManager : MonoBehaviour
     private void Awake()
     {
         _controls = new GameInput();
-        _controls.Game.Restart.started += Restart_started; 
+        _controls.Game.Restart.started += Restart_started;
         _controls.Game.Restart.canceled += _ => StopRestart(); // Альтернативный способ привязки
     }
 

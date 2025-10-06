@@ -35,7 +35,7 @@ public class MouseMove : MonoBehaviour
     private void Update()
     {
         _isRun = _menuToggleManager.DynamicCamera;
-        if (_isRun == false) 
+        if (_isRun == false)
         {
             transform.localEulerAngles = _initialRotation;
             return;
@@ -137,7 +137,7 @@ public class MouseMove : MonoBehaviour
     }
 
     [Inject]
-    private void GetMenuToggleManager (MenuToggleManager menuToggleManager)
+    private void GetMenuToggleManager(MenuToggleManager menuToggleManager)
     {
         _menuToggleManager = menuToggleManager;
     }

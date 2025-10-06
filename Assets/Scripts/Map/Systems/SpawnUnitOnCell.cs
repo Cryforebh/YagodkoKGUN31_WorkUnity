@@ -8,13 +8,12 @@ public class SpawnUnitOnCell : MonoBehaviour
     [Inject] private AllPlayer _player;
     [Inject] private PlayerManager _playerManager;
     [Inject] private TypeGameManager _gameManager;
-    [Inject] private MoveSystem _moveSystem;
-    //[Inject] private UnitManager _unitManager;
     [SerializeField] private Unit _unit;
-    
+
+    [Inject] private SignalBus _signalBus;
+
     private Unit _unitPrefab;
     private Camera _cameraPlayerOne;
-    private Camera _cameraPlayerTwo;
 
     [SerializeField] private EnumTypeGame _typeGame;
     [SerializeField] private EnumPlayers _playerGoesFirst;
@@ -22,25 +21,10 @@ public class SpawnUnitOnCell : MonoBehaviour
     private void Awake()
     {
         _cameraPlayerOne = _playerManager.GetCameraPlayer(EnumPlayers.PlayerOne);
-        _cameraPlayerTwo = _playerManager.GetCameraPlayer(EnumPlayers.PlayerTwo);
 
         // Как только создано будет меню с выбором этих элементов - убрать !!!
         SetTypeGame(_typeGame);
-        //SetWhoGoesFirst(_playerGoesFirst);
-        //
-
         TypeGameCreate();
-    }
-
-    private void Start()
-    {
-
-
-        //CreateUnits();
-        ////Debug.Log($"Создан {cell.CurrentUnit.name}, у него {cell.CurrentUnit.GetHealth} здоровья и {cell.CurrentUnit.GetDamage} урона.\n" +
-        ////    $"Это {cell.CurrentUnit.GetStatusUnit}!");
-
-
     }
 
     public void CreateUnits()
@@ -50,7 +34,7 @@ public class SpawnUnitOnCell : MonoBehaviour
             if (cell.CreateUnit)
             {
                 cell.ResetAll();
-                
+
                 Unit newUnit;
 
                 // Создаём Юнита в кординатах клетки
@@ -77,35 +61,35 @@ public class SpawnUnitOnCell : MonoBehaviour
                 bool isMy = cell.Player == _playerManager.ActivePlayer;
                 newUnit.SetStatusUnit(isMy ? EnumStatusUnitEnemy.My : EnumStatusUnitEnemy.Enemy);
 
-                // Востанавливаем активность дочерних коллекций внутри юнита
+                // Востанавливаем активность дочерних компонентов внутри юнита, если вдруг отключенно
                 newUnit.gameObject.SetActive(true);
                 if (newUnit.gameObject.GetComponent<Ranger>()) newUnit.gameObject.GetComponent<Ranger>().enabled = true;
                 if (newUnit.gameObject.GetComponent<Samurai>()) newUnit.gameObject.GetComponent<Samurai>().enabled = true;
 
+                // Присавиваем необходимые зависимости DI - SignalBus
+                newUnit.gameObject.GetComponent<UnitSelectionPointer>().SignalBusStatus = _signalBus;
+
                 // Привязываем юнита к клетке
-                cell.SetUnit(newUnit); 
+                cell.SetUnit(newUnit);
             }
         }
-        
+
     }
 
     private void TypeGameCreate()
     {
         if (_typeGame == EnumTypeGame.PVP)
         {
-            _cameraPlayerTwo.gameObject.SetActive(false);
             _cameraPlayerOne.gameObject.SetActive(true);
         }
         if (_typeGame == EnumTypeGame.PVE)
         {
             _board.transform.Rotate(0f, 0f, 90f);
-            _cameraPlayerTwo.gameObject.SetActive(false);
             _cameraPlayerOne.gameObject.SetActive(true);
         }
         if (_typeGame == EnumTypeGame.PVPLocal)
         {
             _board.transform.Rotate(0f, 0f, 90f);
-            _cameraPlayerTwo.gameObject.SetActive(true);
             _cameraPlayerOne.gameObject.SetActive(true);
         }
     }

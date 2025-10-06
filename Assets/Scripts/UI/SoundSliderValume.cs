@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
@@ -40,7 +38,7 @@ public class SoundSliderValume : MonoBehaviour
         }
     }
 
-        [Inject]
+    [Inject]
     private void SetSoundManager(SoundManager soundManager)
     {
         _soundManager = soundManager;

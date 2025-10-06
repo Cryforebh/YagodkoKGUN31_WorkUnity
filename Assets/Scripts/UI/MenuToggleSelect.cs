@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
@@ -26,7 +24,8 @@ public class MenuToggleSelect : MonoBehaviour
             case EnumToggleMenu.DynamicCamera:
                 _toggle.isOn = _menuToggleManager.DynamicCamera;
                 break;
-            case EnumToggleMenu.Woman:
+            case EnumToggleMenu.ImmersiveObjects:
+                _toggle.isOn = _menuToggleManager.ImmersiveObjects;
                 break;
             case EnumToggleMenu.MadnessMode:
                 _toggle.isOn = _menuToggleManager.MadnessMode;

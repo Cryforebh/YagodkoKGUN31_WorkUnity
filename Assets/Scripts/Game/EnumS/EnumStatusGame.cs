@@ -1,7 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
 public enum EnumStatusGame
 {
     Empty = 0,
@@ -12,8 +8,3 @@ public enum EnumStatusGame
 
 }
 
-//public enum EnumStatusGameCell
-//{
-//    Empty,
-//    Selected,
-//}

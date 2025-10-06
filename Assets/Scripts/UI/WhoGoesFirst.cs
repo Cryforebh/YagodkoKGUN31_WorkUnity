@@ -1,9 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.UIElements;
-using Zenject;
 
 public class WhoGoesFirst : MonoBehaviour/*, IPointerEnterHandler, IPointerExitHandler*/
 {
@@ -14,7 +9,7 @@ public class WhoGoesFirst : MonoBehaviour/*, IPointerEnterHandler, IPointerExitH
 
     //private void Awake()
     //{
-        
+
     //}
 
     //public void SelectedPlayerOne()

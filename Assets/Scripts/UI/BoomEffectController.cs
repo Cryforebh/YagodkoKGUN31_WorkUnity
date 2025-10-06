@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class BoomEffectController : MonoBehaviour
@@ -18,7 +17,7 @@ public class BoomEffectController : MonoBehaviour
     private SpriteRenderer _spriteRenderer;
     private Transform _mainCamera;
     private Unit _unit;
-    private bool _isPlaying;    
+    private bool _isPlaying;
 
     void Awake()
     {

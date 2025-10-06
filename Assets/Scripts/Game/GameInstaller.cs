@@ -5,6 +5,7 @@ public class GameInstaller : MonoInstaller
 {
     [SerializeField] private CellManager _cellManagerPrefab;
     [SerializeField] private Board _board;
+    [SerializeField] private GameData _gameData;
 
     public override void InstallBindings()
     {
@@ -16,5 +17,6 @@ public class GameInstaller : MonoInstaller
             .FromInstance(_cellManagerPrefab)
             .AsSingle()
             .NonLazy();
+        Container.BindInstance(_gameData).AsSingle();
     }
 }

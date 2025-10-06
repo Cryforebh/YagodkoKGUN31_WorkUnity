@@ -1,10 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
 
-public class HealthBarManager : MonoBehaviour
+public class StatisticsUnitsVisualManager : MonoBehaviour
 {
     [Inject] private PlayerManager _playerManager;
 
@@ -12,8 +10,6 @@ public class HealthBarManager : MonoBehaviour
     [SerializeField] private Vector3 _offcet = new Vector3(1, 1.5f, 0);
     [SerializeField] private Canvas _canvasPlayerOne;
     [SerializeField] private Image _healthBarImageOnePlayer;
-    [SerializeField] private Canvas _canvasPlayerTwo;
-    [SerializeField] private Image _healthBarImageTwoPlayer;
 
     [Header("Настройки отображения уровня персонажа")]
     [SerializeField] private Image _levelTwo;
@@ -30,10 +26,8 @@ public class HealthBarManager : MonoBehaviour
     [SerializeField] private RenderMode _renderMode = RenderMode.ScreenSpaceCamera;
 
     public Image HealthBarImageOnePlayer => _healthBarImageOnePlayer;
-    public Image HealthBarImageTwoPlayer => _healthBarImageTwoPlayer;
     public Vector3 Offcet => _offcet;
     public Canvas CanvasPlayerOne => _canvasPlayerOne;
-    public Canvas CanvasPlayerTwo => _canvasPlayerTwo;
     public Image LevelTwo => _levelTwo;
     public Image LevelThree => _levelThree;
     public Image LevelFore => _levelFore;
@@ -45,10 +39,8 @@ public class HealthBarManager : MonoBehaviour
     private void Start()
     {
         _canvasPlayerOne.enabled = false;
-        _canvasPlayerTwo.enabled = false;
 
         ConfigureCanvas(_canvasPlayerOne, _playerManager.GetCameraPlayer(EnumPlayers.PlayerOne));
-        ConfigureCanvas(_canvasPlayerTwo, _playerManager.GetCameraPlayer(EnumPlayers.PlayerTwo));
 
         _levelTwo.enabled = false;
         _levelThree.enabled = false;

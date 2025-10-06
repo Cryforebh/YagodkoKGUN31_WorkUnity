@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class SoundManager : MonoBehaviour
@@ -11,7 +9,7 @@ public class SoundManager : MonoBehaviour
 
     public float ValumeUnits { get => _valumeUnits; set => _valumeUnits = value; }
     public float ValumeOther { get => _valumeOther; set => _valumeOther = value; }
-    public float ValumeAmbient { get => _valumeAmbient; set => _valumeAmbient = value;}
+    public float ValumeAmbient { get => _valumeAmbient; set => _valumeAmbient = value; }
     public float ValumeModifications { get => _valumeModifications; set => _valumeModifications = value; }
 
     void Awake()

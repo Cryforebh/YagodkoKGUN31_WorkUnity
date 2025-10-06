@@ -1,22 +1,9 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class SceneController : MonoBehaviour
 {
-    //private void OpenMainScene()
-    //{
-    //    // Выгружаем все сцены кроме основной (если нужно)
-    //    SceneManager.LoadScene(0, LoadSceneMode.Single);
-    //}
-
-    //public void OpenGameScene(int index)
-    //{
-    //    if (index == 0) OpenMainScene();
-
-    //    // Аддитивно загружаем игровую сцену
-    //    SceneManager.LoadScene(index, LoadSceneMode.Additive);
-    //}
-
     public void RestartScene()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
@@ -29,6 +16,25 @@ public class SceneController : MonoBehaviour
 
     public void EnterPlayGame()
     {
-        SceneManager.LoadScene(1);
+        //SceneManager.LoadScene(1);
+        StartCoroutine(LoadAsync(1, 1));
+    }
+
+    private IEnumerator LoadAsync(int sceneIndex, float timeOut)
+    {
+        AsyncOperation operation = SceneManager.LoadSceneAsync(sceneIndex);
+        operation.allowSceneActivation = false; // Запрещаем авто-переход
+
+        yield return new WaitForSeconds(timeOut);
+
+        while (!operation.isDone)
+        {
+            if (operation.progress >= 0.9f)
+            {
+                operation.allowSceneActivation = true; // Разрешаем переход
+            }
+
+            yield return null;
+        }
     }
 }

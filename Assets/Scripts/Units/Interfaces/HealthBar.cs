@@ -1,30 +1,25 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
 using Zenject;
 
 [RequireComponent(typeof(Unit))]
 public class HealthBar : MonoBehaviour, IPointerEnterHandler, IPointerClickHandler, IPointerExitHandler
 {
-    [Inject] private PlayerManager _playerManager;
-    [Inject] private HealthBarManager _healthBarManager;
+    [Inject] private StatisticsUnitsVisualManager _healthBarManager;
+    [Inject] private GameData _gameData;
 
     private Vector3 _offcet;
     private Unit _unit;
-    private Canvas _canvasPlayerOne;
-    private Canvas _canvasPlayerTwo;
+    private Canvas _canvasPlayer;
     private float _maxHealth;
     private float _currentHealth;
-    private Camera _cameraOnePlayer;
-    private Camera _cameraTwoPlayer;
+
+    private bool _isCursorEnterTarget;
 
     private void Awake()
     {
-        _healthBarManager = FindObjectOfType<HealthBarManager>();
-        _playerManager = FindObjectOfType<PlayerManager>();
-
-        _cameraOnePlayer = _playerManager.GetCameraPlayer(EnumPlayers.PlayerOne);
-        _cameraTwoPlayer = _playerManager.GetCameraPlayer(EnumPlayers.PlayerTwo);
+        _healthBarManager = FindObjectOfType<StatisticsUnitsVisualManager>();
+        _gameData = FindObjectOfType<GameData>();
     }
 
     private void Start()
@@ -32,36 +27,39 @@ public class HealthBar : MonoBehaviour, IPointerEnterHandler, IPointerClickHandl
         _offcet = _healthBarManager.Offcet;
         _unit = GetComponent<Unit>();
 
-        _canvasPlayerOne = _healthBarManager.CanvasPlayerOne;
-        _canvasPlayerTwo = _healthBarManager.CanvasPlayerTwo;
+        _canvasPlayer = _healthBarManager.CanvasPlayerOne;
+    }
+
+    private void Update()
+    {
+        VerificationProcessLock();
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        _canvasPlayerOne.enabled = false;
-        if (_unit.IsDead) return;
-        _canvasPlayerOne.enabled = true;
-        DisplayOne();
+        _gameData.StatisticUnitVisual = this;
+        Click();
     }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
+        _gameData.StatisticUnitVisual = this;
+        Enter();
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        _gameData.StatisticUnitVisual = null;
+        Exit();
+    }
+
+    private void Enter()
+    {
+        if (_gameData.Lock == true) return;
         if (_unit.IsDead) return;
 
-        //Debug.Log($"Event camera: {eventData.enterEventCamera?.name}");
-        //Debug.Log($"Press camera: {eventData.pressEventCamera?.name}");
-        //Debug.Log($"Raycast camera: {eventData.pointerCurrentRaycast.module?.eventCamera?.name}");
-
-        if (eventData.pressEventCamera == _cameraOnePlayer)
-        {
-            _canvasPlayerOne.enabled = true;
-            DisplayOne();
-        }
-        if (eventData.pressEventCamera == _cameraTwoPlayer)
-        {
-            _canvasPlayerTwo.enabled = true;
-            DisplayTwo();
-        }
+        _canvasPlayer.enabled = true;
+        Display();
 
         if (_unit.Level == 2)
         {
@@ -85,16 +83,19 @@ public class HealthBar : MonoBehaviour, IPointerEnterHandler, IPointerClickHandl
         if (_unit.ModifierDrowRange && _unit.Class == EnumStatusUnitClass.Ranger) _healthBarManager.ModifierDrowRange.enabled = true;
     }
 
-    public void OnPointerExit(PointerEventData eventData)
+    private void Click()
     {
-        if (eventData.pressEventCamera == _cameraOnePlayer)
-        {
-            _canvasPlayerOne.enabled = false;
-        }
-        if (eventData.pressEventCamera == _cameraTwoPlayer)
-        {
-            _canvasPlayerTwo.enabled = false;
-        }
+        if (_gameData.Lock == true /*|| _gameData.LockClick*/) return;
+
+        _canvasPlayer.enabled = false;
+        if (_unit.IsDead) return;
+        _canvasPlayer.enabled = true;
+        Display();
+    }
+
+    private void Exit()
+    {
+        _canvasPlayer.enabled = false;
 
         _healthBarManager.LevelTwo.enabled = false;
         _healthBarManager.LevelThree.enabled = false;
@@ -106,22 +107,14 @@ public class HealthBar : MonoBehaviour, IPointerEnterHandler, IPointerClickHandl
         _healthBarManager.ModifierDrowRange.enabled = false;
     }
 
-    private void PositionOnUnitOne()
+    private void PositionOnUnit()
     {
-        _canvasPlayerOne.transform.position = _unit.transform.position + _offcet;
-
-        //_canvas.transform.LookAt(_camera.transform);
-        //_canvas.transform.Rotate(0, 180f, 0); // Корректировка ориентации
+        _canvasPlayer.transform.position = _unit.transform.position + _offcet;
     }
 
-    private void PositionOnUnitTwo()
+    private void Display()
     {
-        _canvasPlayerTwo.transform.position = _unit.transform.position + _offcet + new Vector3(-2, 0, 0);
-    }
-
-    private void DisplayOne()
-    {
-        PositionOnUnitOne();
+        PositionOnUnit();
 
         _maxHealth = _unit.GetMaxHealth;
         _currentHealth = _unit.Health;
@@ -129,14 +122,25 @@ public class HealthBar : MonoBehaviour, IPointerEnterHandler, IPointerClickHandl
         _healthBarManager.HealthBarImageOnePlayer.fillAmount = _currentHealth / _maxHealth;
     }
 
-    private void DisplayTwo()
+    /// <summary>
+    /// Убирает признаки выделения обьекта во время блокировки, и возвращает при отмене блокировки (если указатель направлен на него)
+    /// </summary>
+    private void VerificationProcessLock()
     {
-        PositionOnUnitTwo();
+        if (_gameData.Lock == true)
+        {
+            _isCursorEnterTarget = true;
+            _canvasPlayer.enabled = false;
+        }
+        else if (_isCursorEnterTarget)
+        {
+            _isCursorEnterTarget = false;
 
-        _maxHealth = _unit.GetMaxHealth;
-        _currentHealth = _unit.Health;
-
-        _healthBarManager.HealthBarImageTwoPlayer.fillAmount = _currentHealth / _maxHealth;
+            if (this == _gameData.StatisticUnitVisual)
+            {
+                Enter();
+                _gameData.StatisticUnitVisual = null;
+            }
+        }
     }
-
 }

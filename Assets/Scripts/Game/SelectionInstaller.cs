@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
 
@@ -16,7 +14,7 @@ public class SelectionInstaller : MonoInstaller
     [SerializeField]
     private PlayerManager _playerManager;
     [SerializeField]
-    private HealthBarManager _healthBarManager;
+    private StatisticsUnitsVisualManager _healthBarManager;
     [SerializeField]
     private AdvancedCursorController _cursor;
     [SerializeField]
@@ -26,8 +24,11 @@ public class SelectionInstaller : MonoInstaller
 
     public override void InstallBindings()
     {
+        SignalBusInstaller.Install(Container);
+        Container.DeclareSignal<StatusGameSignal>();
+
         Container.Bind<AdvancedCursorController>().FromInstance(_cursor).AsSingle().NonLazy();
-        Container.Bind<HealthBarManager>().FromInstance(_healthBarManager).AsSingle().NonLazy();
+        Container.Bind<StatisticsUnitsVisualManager>().FromInstance(_healthBarManager).AsSingle().NonLazy();
         Container.Bind<SelectionMaterialManager>().FromInstance(_selectionPointerColors).AsSingle().NonLazy();
         Container.Bind<AllCell>().FromInstance(_allCell).AsSingle();
         Container.Bind<SpawnUnitOnCell>().FromInstance(_spawnUnitOnCell).AsSingle();
@@ -36,4 +37,12 @@ public class SelectionInstaller : MonoInstaller
         Container.Bind<SoundsUnit>().FromInstance(_soundsUnitManager).AsSingle();
         Container.Bind<BoomEffectController>().FromInstance(_explosionController).AsSingle().NonLazy();
     }
+}
+
+public enum StatusGameSignal
+{
+    Return = 0,
+    SelectUnit = 1,
+    SelectCell = 2,
+    SelectAttack = 3,
 }

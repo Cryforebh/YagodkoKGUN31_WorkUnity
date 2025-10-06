@@ -10,6 +10,8 @@ public class Cell : MonoBehaviour, IPointerEnterHandler, IPointerClickHandler, I
     [Inject] private AllCell _allCell;
     [Inject] private AdvancedCursorController _cursor;
 
+    private SignalBus _statusGameSignal;
+
     [Header("Настройка Клетки (Положение в Массиве):")]
     [SerializeField] private int _localX;
     [SerializeField] private int _localY;
@@ -56,12 +58,18 @@ public class Cell : MonoBehaviour, IPointerEnterHandler, IPointerClickHandler, I
         ResetAll();
     }
 
+    [Inject]
+    private void Construct(SignalBus signalBus)
+    {
+        _statusGameSignal = signalBus;
+    }
+
     public void SetSelect(Material mat)
     {
         if (CurrentUnit == null)
         {
             _select.sharedMaterial = mat;
-            _select.enabled = true;
+            //_select.enabled = true;
             _isSelected = true;
         }
     }
@@ -82,7 +90,7 @@ public class Cell : MonoBehaviour, IPointerEnterHandler, IPointerClickHandler, I
         SetModifier(unit);
         CurrentUnit = unit;
     }
-    public void ClearUnit()     
+    public void ClearUnit()
     {
         RemoveModifier(CurrentUnit);
         CurrentUnit = null;
@@ -106,7 +114,7 @@ public class Cell : MonoBehaviour, IPointerEnterHandler, IPointerClickHandler, I
         {
             unit.ModifierDrowRange = false;
             unit.AttackRange -= 1;
-        } 
+        }
     }
 
     public void OnPointerEnter(PointerEventData eventData)
@@ -134,6 +142,9 @@ public class Cell : MonoBehaviour, IPointerEnterHandler, IPointerClickHandler, I
 
             _moveSystem.SetTargetActionCell(this);
             Debug.Log("Данные выбранной клетки переданы");
+
+            _focus.enabled = false;
+            _statusGameSignal.Fire(StatusGameSignal.SelectCell);
 
             // Курсор - Дефолт
             _cursor.SetCursorState(EnumStatusCursor.Default);

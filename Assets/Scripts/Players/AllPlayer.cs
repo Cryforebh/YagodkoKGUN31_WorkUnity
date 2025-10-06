@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -38,10 +37,10 @@ public class AllPlayer : MonoBehaviour
     {
         // Если юнит уже хранит информацию о своём владельце
         if (unit.Player != EnumPlayers.None)
-        return unit.Player; // Просто возвращаем значение из свойства Unit
+            return unit.Player; // Просто возвращаем значение из свойства Unit
 
         Debug.LogWarning($"Внимание: Списков с {unit} не обнаруженно! Присвоенно значение {EnumPlayers.None}!");
-        return EnumPlayers.None; 
+        return EnumPlayers.None;
     }
 
 }

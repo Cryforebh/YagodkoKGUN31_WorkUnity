@@ -4,6 +4,9 @@ public class WinImage : MonoBehaviour
 {
     [SerializeField] private RedWiner _redWiner;
     [SerializeField] private BlueWiner _blueWiner;
+    [SerializeField] private Animation _animWinInfo;
+    [SerializeField] private Animation _animRestartInfo;
+    [SerializeField] private Animation _animMenuInfo;
 
     private void Awake()
     {
@@ -29,6 +32,10 @@ public class WinImage : MonoBehaviour
             default:
                 break;
         }
+
+        _animWinInfo.Play();
+        _animRestartInfo.Play();
+        _animMenuInfo.Play();
     }
 
 }

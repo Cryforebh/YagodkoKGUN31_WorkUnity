@@ -1,6 +1,4 @@
 using System.Collections;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using Zenject;
@@ -11,6 +9,7 @@ public class ObjectActive : MonoBehaviour, IPointerEnterHandler, IPointerClickHa
     [Inject] private AdvancedCursorController _cursor;
     [Inject] private AllCell _allCell;
     [Inject] private PlayerManager _playerManager;
+    [Inject] private GameData _gameData;
 
     [Header("Настройки взаимодейсвтия с обьектом:")]
     [SerializeField, Tooltip("Какой звук производить, при активации обьекта?")] private AudioClip[] _soundStartActive;
@@ -44,6 +43,8 @@ public class ObjectActive : MonoBehaviour, IPointerEnterHandler, IPointerClickHa
     private MeshRenderer _origanalMeshRenderer;
     private Material _originalMaterial;
 
+    private bool _isCursorEnterTarget;
+
     private int _countActivePlayerOne;
     private int _countActivePlayerTwo;
 
@@ -59,9 +60,26 @@ public class ObjectActive : MonoBehaviour, IPointerEnterHandler, IPointerClickHa
         _countActivePlayerTwo = _countActive;
     }
 
-    public void OnPointerClick(PointerEventData eventData)
+    private void Update()
     {
-        //if (!gameObject.activeSelf || !_LocalObjectDelete.activeSelf) return;
+        VerificationProcessLock();
+    }
+
+    private void Enter()
+    {
+        if (_gameData.Lock == true) return;
+
+        if (_player == EnumPlayers.None || _playerManager.ActivePlayer == _player)
+        {
+            _cursor.SetCursorState(_cursorSelect);
+
+            if (_turnBacklight) _objectRenderer.material = _selectMaterial;
+        }
+    }
+
+    private void Click()
+    {
+        if (_gameData.Lock == true || _gameData.LockClick) return;
 
         if (_playerAddiction && !AvailableAttempts()) return;
 
@@ -80,7 +98,7 @@ public class ObjectActive : MonoBehaviour, IPointerEnterHandler, IPointerClickHa
                 _allCell.SetModifierAllUnits(EnumModifier.Drink, true, _currentPlayer);
                 StartCoroutine(ModifireTime());
                 break;
-                case EnumModifier.UpHelth:
+            case EnumModifier.UpHelth:
                 _allCell.SetModifierAllUnits(EnumModifier.UpHelth, true, _currentPlayer);
                 break;
             default:
@@ -91,22 +109,27 @@ public class ObjectActive : MonoBehaviour, IPointerEnterHandler, IPointerClickHa
         if (_deleteThisObject) gameObject.SetActive(false);
     }
 
+    private void Exit()
+    {
+        _cursor.SetCursorState(EnumStatusCursor.Default);
+        if (_turnBacklight) _objectRenderer.material = _originalMaterial;
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        Click();
+    }
+
     public void OnPointerEnter(PointerEventData eventData)
     {
-        //if (gameObject.activeSelf == false || _LocalObjectDelete.activeSelf == false) return;
-
-        if (_player == EnumPlayers.None || _playerManager.ActivePlayer == _player)
-        {
-            _cursor.SetCursorState(_cursorSelect);
-            
-            if (_turnBacklight) _objectRenderer.material = _selectMaterial;
-        }
+        _gameData.TargetObjectActiveEnter = this;
+        Enter();
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        _cursor.SetCursorState(EnumStatusCursor.Default);
-        if (_turnBacklight) _objectRenderer.material = _originalMaterial;
+        _gameData.TargetObjectActiveEnter = null;
+        Exit();
     }
 
     private IEnumerator ModifireTime()
@@ -146,6 +169,29 @@ public class ObjectActive : MonoBehaviour, IPointerEnterHandler, IPointerClickHa
             return true;
         }
 
-        else return false; 
+        else return false;
+    }
+
+    /// <summary>
+    /// Убирает признаки выделения обьекта во время блокировки, и возвращает при отмене блокировки (если указатель направлен на него)
+    /// </summary>
+    private void VerificationProcessLock()
+    {
+        if (_gameData.Lock == true)
+        {
+            _isCursorEnterTarget = true;
+            _cursor.SetCursorState(EnumStatusCursor.Default);
+            if (_turnBacklight) _objectRenderer.material = _originalMaterial;
+        }
+        else if (_isCursorEnterTarget)
+        {
+            _isCursorEnterTarget = false;
+
+            if (_gameData.TargetObjectActiveEnter == this)
+            {
+                Enter();
+                _gameData.TargetObjectActiveEnter = null;
+            }
+        }
     }
 }

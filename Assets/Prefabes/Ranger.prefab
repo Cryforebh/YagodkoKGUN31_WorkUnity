@@ -338,13 +338,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb74f44d90f2a4041b0bedbd9695b4cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _bHealth: 11
-  _bStrength: 1
-  _bDamageWeapon: 3
-  _bAttackRange: 4
-  _bAttackPattern: 1
-  _bMoveRange: 2
-  _bDeathDelay: 0.5
+  _baseHealth: 13
+  _baseStrength: 0
+  _lvlUpHealthCount: 4
+  _lvlUpStrengthCount: 1
+  _weaponDamage: 3
+  _attackRange: 4
+  _attackPattern: 1
+  _moveRange: 2
+  _lvlUpMoveRangeCount: 1
+  _deathDelay: 0.5
+  _modifierSushiHealth: 5
   _bSoundsSelect:
   - {fileID: 8300000, guid: 40aa9ec0af67e224b8dc10e6a6e49ed3, type: 3}
   - {fileID: 8300000, guid: 2c37f0108cdd4b048a9180ea7682c2fb, type: 3}

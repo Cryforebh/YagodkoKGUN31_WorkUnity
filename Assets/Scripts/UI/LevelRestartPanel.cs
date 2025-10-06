@@ -1,9 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using Zenject;
 
 public class LevelRestartPanel : MonoBehaviour
 {
@@ -13,12 +9,12 @@ public class LevelRestartPanel : MonoBehaviour
 
     public float fillAmount { get; private set; }
 
-    public void ShowPanel() 
+    public void ShowPanel()
     {
         gameObject.SetActive(true);
         _backGround.enabled = true;
-    } 
-    
+    }
+
     public void HidePanel()
     {
         gameObject.SetActive(false);

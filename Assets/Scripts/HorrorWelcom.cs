@@ -1,6 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using Zenject;
 
@@ -55,7 +53,7 @@ public class HorrorWelcom : MonoBehaviour
     }
 
     //----------------------------------
-    
+
     private void AwakeSetting()
     {
         _audioSource = GetComponent<AudioSource>();
@@ -85,7 +83,7 @@ public class HorrorWelcom : MonoBehaviour
     {
         if (_enumHorrorType != EnumHorrorType.Welcom) return;
         if (_menuToggleManager.MadnessMode == false) return;
-        if (isOneTry == true) return; 
+        if (isOneTry == true) return;
 
         isOneTry = true;
         _audioSource.enabled = true;
@@ -112,7 +110,7 @@ public class HorrorWelcom : MonoBehaviour
         if (_audioSource.clip != null) _audioSource.Play();
         if (_animation != null) _animation.Play();
 
-        if (_isNextDisable == false) return ;
+        if (_isNextDisable == false) return;
 
         StartCoroutine(DisableControlsTime());
     }

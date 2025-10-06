@@ -1,8 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public enum EnumPlayers 
+public enum EnumPlayers
 {
     None = 0,
     PlayerOne = 1,
