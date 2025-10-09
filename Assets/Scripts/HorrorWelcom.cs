@@ -32,13 +32,13 @@ public class HorrorWelcom : MonoBehaviour
             case EnumHorrorType.Welcom:
                 break;
             case EnumHorrorType.HorrorHeadRight:
-                _levelManager.Contlols.Game.HorrorHeadRight.canceled += _ => ShowControls();
+                _levelManager.Controls.Game.HorrorHeadRight.canceled += _ => ShowControls();
                 break;
             case EnumHorrorType.HorrorHeadLeft:
-                _levelManager.Contlols.Game.HorrorHeadLeft.canceled += _ => ShowControls();
+                _levelManager.Controls.Game.HorrorHeadLeft.canceled += _ => ShowControls();
                 break;
             case EnumHorrorType.HorrorHeadLong:
-                _levelManager.Contlols.Game.HorrorHeadLong.canceled += _ => ShowControls();
+                _levelManager.Controls.Game.HorrorHeadLong.canceled += _ => ShowControls();
                 break;
             default:
                 break;
@@ -156,13 +156,13 @@ public class HorrorWelcom : MonoBehaviour
             case EnumHorrorType.Welcom:
                 break;
             case EnumHorrorType.HorrorHeadRight:
-                _levelManager.Contlols.Game.HorrorHeadRight.canceled -= _ => ShowControls();
+                _levelManager.Controls.Game.HorrorHeadRight.canceled -= _ => ShowControls();
                 break;
             case EnumHorrorType.HorrorHeadLeft:
-                _levelManager.Contlols.Game.HorrorHeadLeft.canceled -= _ => ShowControls();
+                _levelManager.Controls.Game.HorrorHeadLeft.canceled -= _ => ShowControls();
                 break;
             case EnumHorrorType.HorrorHeadLong:
-                _levelManager.Contlols.Game.HorrorHeadLong.canceled -= _ => ShowControls();
+                _levelManager.Controls.Game.HorrorHeadLong.canceled -= _ => ShowControls();
                 break;
             default:
                 break;

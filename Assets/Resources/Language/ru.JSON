@@ -1,0 +1,53 @@
+{
+  "welcome_message": "Добро пожаловать в игру!",
+  "menu_start_button": "Играть",
+  "menu_setting_button": "Настройки",
+  "menu_exit_button": "Выход",
+  "menu_restart_button": "Рестарт",
+  "menu_manual_button": "Справочник",
+  "menu_mainmenu_button": "Главное меню",
+  "menu_continue_button": "Продолжить",
+  "menu_back_button": "Назад",
+  "setting_quality": "Графика",
+  "setting_sounds": "Звуки",
+  "setting_game": "Игра",
+  "setting_language": "Язык",
+  "quality_verylow": "Нижайшие",
+  "quality_low": "Низкие",
+  "quality_medium": "Средние",
+  "quality_high": "Высокие",
+  "quality_veryhigh": "Высочайшие",
+  "quality_ultra": "Ультра",
+  "sounds_units": "Юниты",
+  "sounds_modifications": "Модификации",
+  "sounds_ambient": "Окружение",
+  "sounds_other": "Остальное",
+  "game_dynamiccamera": "Динамическая камера",
+  "game_madnessmode": "Режим Безумие +18",
+  "game_immersiveobject": "Обьекты окружения",
+
+  "sushi": "Суши",
+  "sushi_info": "Восстанавливает ",
+  "sushi_infotwo": " единиц здоровья всем юнитам.",
+  "sake": "Саке",
+  "sake_info": "Все ваши юниты наносят максимальный урон до конца хода.",
+
+  "win_menu": "Меню -",
+  "win_restart": "Рестарт - Зажать",
+
+  "ws_samurai": "Самурай",
+  "ws_ranger": "Лучник",
+
+  "ws_health": "Здоровье",
+  "ws_damage": "Урон",
+  "ws_attackrangesamurai": "Дальность атаки (Катана - Вокруг себя)",
+  "ws_attackrangeranger": "Дальность атаки (Лук - Колличество клеток от себя)",
+  "ws_moverange": "Дальность хода (Колличество клеток от себя)",
+
+  "ws_modifi_damage": "Увеличивает: Урон Самурая на 1 очко.",
+  "ws_modifi_attackdamage": "Увеличивает: Дальность атаки Лучника на 1 клетку.",
+  "ws_modifi_resistance": "Увеличивает: Сопротивление урону на 50%.",
+
+  "ws_eat_info_onetry": "Колличество на игрока: 1",
+  "ws_eat_info_twotry": "Колличество на игрока: 2"
+}

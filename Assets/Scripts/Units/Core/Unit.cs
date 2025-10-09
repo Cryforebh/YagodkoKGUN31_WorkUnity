@@ -7,7 +7,8 @@ using Zenject;
 public abstract class Unit : MonoBehaviour
 {
     [Inject] private AllPlayer _allPlayer;
-    [Inject] private SoundManager _soundManager;
+    [Inject] private SoundManager _soundManager; // Используется!
+    [Inject] private SettingObjectManager _settingObjectManager;
 
     [Header("Настройки характеристик:")]
     [SerializeField][Range(1f, 50f)] private float _baseHealth = 14f;
@@ -23,8 +24,6 @@ public abstract class Unit : MonoBehaviour
     [SerializeField][Range(0f, 2f)] private int _lvlUpMoveRangeCount;
     [Header("Настройки Смерти")]
     [SerializeField] private float _deathDelay = 0.5f;
-    [Header("Настройки Модификаций")]
-    [SerializeField][Range(1f, 10f)] private float _modifierSushiHealth = 5;
 
     private Vector3 _position;
     private float _currentHealth;
@@ -60,7 +59,6 @@ public abstract class Unit : MonoBehaviour
     public bool ModifierDefense { get => _modifierDefense; set => _modifierDefense = value; }
     public int ModifierDamage { get => _modifierDamage; set => _modifierDamage = value; }
     public bool ModifierDrowRange { get => _modifierDrowRange; set => _modifierDrowRange = value; }
-    public float ModifierSushiHealth => _modifierSushiHealth;
     public List<AudioClip> SoundSelect { get => _soundsSelect; protected set => _soundsSelect = value; }
     public List<AudioClip> SoundGoCell { get => _soundsGoCell; protected set => _soundsGoCell = value; }
     public List<AudioClip> SoundAttack { get => _soundsAttack; protected set => _soundsAttack = value; }
@@ -80,6 +78,8 @@ public abstract class Unit : MonoBehaviour
     {
         _audioSource = GetComponent<AudioSource>();
         _allPlayer = FindObjectOfType<AllPlayer>();
+        _settingObjectManager = FindObjectOfType<SettingObjectManager>();
+
         _currentHealth = GetMaxHealth;
 
         name = "Юнит";
@@ -114,7 +114,7 @@ public abstract class Unit : MonoBehaviour
                 _modifierDrink = offAndOn;
                 break;
             case EnumModifier.UpHelth:
-                _currentHealth += _modifierSushiHealth;
+                _currentHealth += _settingObjectManager.MofifiSushiHealthUp;
                 if (GetMaxHealth < _currentHealth) _currentHealth = GetMaxHealth;
                 break;
             default:
@@ -160,7 +160,7 @@ public abstract class Unit : MonoBehaviour
     {
         if (!_modifierDrink)
         {
-            var min = Damage / 1.3f;
+            var min = Damage / 1.4f;
             var max = Damage;
             Damage = GetPastDamage = UnityEngine.Random.Range(min, max);
         }

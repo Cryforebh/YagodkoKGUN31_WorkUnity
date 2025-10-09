@@ -26,7 +26,9 @@ public class LightStreet : MonoBehaviour
         _baseBrightness = _light.intensity;
     }
 
-    private void Start() => StartCoroutine(StrikeController());
+    //private void Start() => StartCoroutine(StrikeController());
+
+    private void OnEnable() => StartCoroutine(StrikeController());
 
     private IEnumerator StrikeController()
     {

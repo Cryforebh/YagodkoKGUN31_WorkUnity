@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using Zenject;
@@ -47,9 +48,14 @@ public class UnitSelectionPointer : MonoBehaviour, IPointerEnterHandler, IPointe
         _originalMaterial = _meshRenderer.material;
     }
 
-    private void Update()
+    private void OnEnable()
     {
-        VerificationProcessLock();
+        StartCoroutine(VerificationProcessLock());
+    }
+
+    private void OnDisable()
+    {
+        StopCoroutine(VerificationProcessLock());
     }
 
     /// <summary>
@@ -261,23 +267,29 @@ public class UnitSelectionPointer : MonoBehaviour, IPointerEnterHandler, IPointe
     /// <summary>
     /// Убирает признаки выделения обьекта во время блокировки, и возвращает при отмене блокировки (если указатель направлен на него)
     /// </summary>
-    private void VerificationProcessLock()
+    private IEnumerator VerificationProcessLock()
     {
-        if (_gameData.Lock == true)
+        while (true)
         {
-            _isCursorEnterTarget = true;
-            _animatedCursor.SetCursorState(EnumStatusCursor.Default);
-            _meshRenderer.material = _originalMaterial;
-        }
-        else if (_isCursorEnterTarget)
-        {
-            _isCursorEnterTarget = false;
 
-            if (_gameData.TargetUnitEnter == _unit)
+            if (_gameData.Lock == true)
             {
-                Enter();
-                _gameData.TargetUnitEnter = null;
+                _isCursorEnterTarget = true;
+                _animatedCursor.SetCursorState(EnumStatusCursor.Default);
+                _meshRenderer.material = _originalMaterial;
             }
+            else if (_isCursorEnterTarget)
+            {
+                _isCursorEnterTarget = false;
+
+                if (_gameData.TargetUnitEnter == _unit)
+                {
+                    Enter();
+                    _gameData.TargetUnitEnter = null;
+                }
+            }
+
+            yield return null;
         }
     }
 

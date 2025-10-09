@@ -1,0 +1,53 @@
+{
+  "welcome_message": "Welcome to the game!",
+  "menu_start_button": "Start",
+  "menu_setting_button": "Setting",
+  "menu_exit_button": "Exit",
+  "menu_restart_button": "Restart",
+  "menu_manual_button": "Manual",
+  "menu_mainmenu_button": "Main menu",
+  "menu_continue_button": "Continue",
+  "menu_back_button": "Back",
+  "setting_quality": "Quality",
+  "setting_sounds": "Sounds",
+  "setting_game": "Game",
+  "setting_language": "Language",
+  "quality_verylow": "Very Low",
+  "quality_low": "Low",
+  "quality_medium": "Medium",
+  "quality_high": "High",
+  "quality_veryhigh": "Very High",
+  "quality_ultra": "Ultra",
+  "sounds_units": "Units",
+  "sounds_modifications": "Modifications",
+  "sounds_ambient": "Ambient",
+  "sounds_other": "Other",
+  "game_dynamiccamera": "Dynamic camera",
+  "game_madnessmode": "Madness Mode +18",
+  "game_immersiveobject": "Immersive Objects",
+
+  "sushi": "Sushi",
+  "sushi_info": "Restores ",
+  "sushi_infotwo": " health to all units.",
+  "sake": "Sake",
+  "sake_info": "All your units deal maximum damage until the end of the turn.",
+
+  "win_menu": "Menu -",
+  "win_restart": "Restart - Hold",
+
+  "ws_samurai": "Samurai",
+  "ws_ranger": "Archer",
+
+  "ws_health": "Health",
+  "ws_damage": "Damage",
+  "ws_attackrangesamurai": "Attack range (Katana - Around oneself)",
+  "ws_attackrangeranger": "Attack range (Bow - Number of cells away from oneself)",
+  "ws_moverange": "Movement range (Number of cells away from oneself)",
+
+  "ws_modifi_damage": "Increases: Samurai damage by 1 point",
+  "ws_modifi_attackdamage": "Increases: Archer’s attack range by 1 cell",
+  "ws_modifi_resistance": "Increases: Damage resistance by 50 %",
+
+  "ws_eat_info_onetry": "Number per player: 1",
+  "ws_eat_info_twotry": "Number per player: 2"
+}
