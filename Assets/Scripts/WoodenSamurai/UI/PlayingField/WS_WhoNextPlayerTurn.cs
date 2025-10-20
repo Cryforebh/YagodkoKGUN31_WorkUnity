@@ -14,7 +14,7 @@ public class WS_WhoNextPlayerTurn : MonoBehaviour
     [SerializeField] private bool _isTrueLineTwo = false;
 
     private IPlayerManager _playerManager;
-    private SignalBus _statusGame;
+    //private SignalBus _statusGame;
     private Coroutine _currentCoroutine;
 
     private Animation _redAnimation;
@@ -42,12 +42,12 @@ public class WS_WhoNextPlayerTurn : MonoBehaviour
     }
 
     [Inject]
-    private void Construct(IPlayerManager player, SignalBus signalBus)
+    private void Construct(IPlayerManager player/*, SignalBus signalBus*/)
     {
         _playerManager = player;
-        _statusGame = signalBus;
+        //_statusGame = signalBus;
 
-        _statusGame.Subscribe<StatusGameSignal>(FakeSubscrube);
+        //_statusGame.Subscribe<StatusGameSignal>(FakeSubscrube);
     }
 
     public void ShowStartGame(EnumPlayers players)
@@ -105,7 +105,7 @@ public class WS_WhoNextPlayerTurn : MonoBehaviour
     }
     */
 
-    private void FakeSubscrube(StatusGameSignal statusGame) { } // Чтобы не вылезали знаки "внимание" в дебаге, так как не используется сигнал!
+    //private void FakeSubscrube(StatusGameSignal statusGame) { } // Чтобы не вылезали знаки "внимание" в дебаге, так как не используется сигнал!
 
     private IEnumerator TimeShow()
     {
@@ -142,7 +142,7 @@ public class WS_WhoNextPlayerTurn : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (_statusGame != null) _statusGame.Unsubscribe<StatusGameSignal>(FakeSubscrube);
+        //if (_statusGame != null) _statusGame.Unsubscribe<StatusGameSignal>(FakeSubscrube);
 
         if (_currentCoroutine != null) StopCoroutine(_currentCoroutine);
     }

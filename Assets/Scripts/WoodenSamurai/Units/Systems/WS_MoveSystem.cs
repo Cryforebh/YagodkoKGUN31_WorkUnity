@@ -10,7 +10,7 @@ public class WS_MoveSystem : MonoBehaviour
     [Inject] private WS_SoundsUnit _soundUnit;
     [Inject] private BoomEffectController _explosionController;
 
-    private SignalBus _statusGameSignal;
+    //private SignalBus _statusGameSignal;
 
     //[SerializeField] private Camera _cameraMain;
     [SerializeField] private GameObject _cameraOne;
@@ -33,11 +33,11 @@ public class WS_MoveSystem : MonoBehaviour
         _playerManager.OnWinnerDeclared += HandleGameEnd;
     }
 
-    [Inject]
-    private void Construct(SignalBus status)
-    {
-        _statusGameSignal = status;
-    }
+    //[Inject]
+    //private void Construct(SignalBus status)
+    //{
+    //    _statusGameSignal = status;
+    //}
 
     private void OnDestroy()
     {
@@ -350,7 +350,7 @@ public class WS_MoveSystem : MonoBehaviour
 
         //_statusGame.StatusUpdate(EnumStatusGame.Empty);
 
-        _statusGameSignal.Fire(StatusGameSignal.Return);
+        //_statusGameSignal.Fire(StatusGameSignal.Return);
     }
 
     /// <summary>
@@ -423,7 +423,7 @@ public class WS_MoveSystem : MonoBehaviour
 
         //_statusGame.StatusUpdate(EnumStatusGame.Empty);
 
-        _statusGameSignal.Fire(StatusGameSignal.Return);
+        //_statusGameSignal.Fire(StatusGameSignal.Return);
     }
 
     // Обновляет данные клеток с которыми совершались какие-то взаимодействия

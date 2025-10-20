@@ -15,7 +15,7 @@ public class WS_UnitSelectionPointer : MonoBehaviour, IPointerEnterHandler, IPoi
     [Inject] private WS_SoundsUnit _soundUnit;
     [Inject] private WS_GameData _gameData;
 
-    public SignalBus SignalBusStatus;
+    //public SignalBus SignalBusStatus;
 
     private static WS_UnitSelectionPointer _oldSelectedUnitStatic;
     private bool _selected = false;
@@ -194,7 +194,7 @@ public class WS_UnitSelectionPointer : MonoBehaviour, IPointerEnterHandler, IPoi
 
             // Сюда можно добавлять любые действия
 
-            SignalBusStatus.Fire(StatusGameSignal.SelectAttack);
+            //SignalBusStatus.Fire(StatusGameSignal.SelectAttack);
 
             // Курсор - Дефолт
             _animatedCursor.SetCursorState(EnumStatusCursor.Default);
@@ -208,7 +208,7 @@ public class WS_UnitSelectionPointer : MonoBehaviour, IPointerEnterHandler, IPoi
         {
             // Сюда можно добавлять любые действия
 
-            SignalBusStatus.Fire(StatusGameSignal.SelectUnit);
+            //SignalBusStatus.Fire(StatusGameSignal.SelectUnit);
 
             _soundUnit.SoundPlayOnUnitAndStatusGame(_unit, WS_EnumStatusGame.SelectedUnit);
 

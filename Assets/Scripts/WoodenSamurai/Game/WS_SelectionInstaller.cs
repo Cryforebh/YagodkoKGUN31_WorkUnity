@@ -24,8 +24,8 @@ public class WS_SelectionInstaller : MonoInstaller
 
     public override void InstallBindings()
     {
-        SignalBusInstaller.Install(Container);
-        Container.DeclareSignal<StatusGameSignal>();
+        //SignalBusInstaller.Install(Container);
+        //Container.DeclareSignal<StatusGameSignal>();
 
         Container.Bind<AdvancedCursorController>().FromInstance(_cursor).AsSingle().NonLazy();
         Container.Bind<WS_StatisticsUnitsVisualManager>().FromInstance(_healthBarManager).AsSingle().NonLazy();

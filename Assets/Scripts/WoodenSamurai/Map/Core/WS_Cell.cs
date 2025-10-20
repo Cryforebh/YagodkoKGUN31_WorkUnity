@@ -10,7 +10,7 @@ public class WS_Cell : MonoBehaviour, IPointerEnterHandler, IPointerClickHandler
     [Inject] private WS_AllCell _allCell;
     [Inject] private AdvancedCursorController _cursor;
 
-    private SignalBus _statusGameSignal;
+    //private SignalBus _statusGameSignal;
 
     [Header("Настройка Клетки (Положение в Массиве):")]
     [SerializeField] private int _localX;
@@ -58,11 +58,11 @@ public class WS_Cell : MonoBehaviour, IPointerEnterHandler, IPointerClickHandler
         ResetAll();
     }
 
-    [Inject]
-    private void Construct(SignalBus signalBus)
-    {
-        _statusGameSignal = signalBus;
-    }
+    //[Inject]
+    //private void Construct(SignalBus signalBus)
+    //{
+    //    _statusGameSignal = signalBus;
+    //}
 
     public void SetSelect(Material mat)
     {
@@ -144,7 +144,7 @@ public class WS_Cell : MonoBehaviour, IPointerEnterHandler, IPointerClickHandler
             Debug.Log("Данные выбранной клетки переданы");
 
             _focus.enabled = false;
-            _statusGameSignal.Fire(StatusGameSignal.SelectCell);
+            //_statusGameSignal.Fire(StatusGameSignal.SelectCell);
 
             // Курсор - Дефолт
             _cursor.SetCursorState(EnumStatusCursor.Default);

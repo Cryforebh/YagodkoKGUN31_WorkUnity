@@ -10,7 +10,7 @@ public class WS_SpawnUnitOnCell : MonoBehaviour, ISpawner
     [Inject] private WS_TypeGameManager _gameManager;
     [SerializeField] private WS_Unit _unit;
 
-    [Inject] private SignalBus _signalBus;
+    //[Inject] private SignalBus _signalBus;
 
     private WS_Unit _unitPrefab;
     //private Camera _cameraPlayerOne;
@@ -66,8 +66,8 @@ public class WS_SpawnUnitOnCell : MonoBehaviour, ISpawner
                 if (newUnit.gameObject.GetComponent<WS_Ranger>()) newUnit.gameObject.GetComponent<WS_Ranger>().enabled = true;
                 if (newUnit.gameObject.GetComponent<WS_Samurai>()) newUnit.gameObject.GetComponent<WS_Samurai>().enabled = true;
 
-                // Присавиваем необходимые зависимости DI - SignalBus
-                newUnit.gameObject.GetComponent<WS_UnitSelectionPointer>().SignalBusStatus = _signalBus;
+                //// Присавиваем необходимые зависимости DI - SignalBus
+                //newUnit.gameObject.GetComponent<WS_UnitSelectionPointer>().SignalBusStatus = _signalBus;
 
                 // Привязываем юнита к клетке
                 cell.SetUnit(newUnit);
