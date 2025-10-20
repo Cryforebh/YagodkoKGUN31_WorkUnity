@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1896024584317587424
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1645750901507046392}
+  - component: {fileID: 3104025794668608206}
+  m_Layer: 0
+  m_Name: ColorContainer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1645750901507046392
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1896024584317587424}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3104025794668608206
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1896024584317587424}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea0c2b028319c3a49bb3f77db36df2bb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _materialPlayerOne: {fileID: 2100000, guid: ae24fc6b95103324fbd261f5bbd5af6a, type: 2}
+  _materialPlayerTwo: {fileID: 2100000, guid: d268e239a4439e147995e507619fb9ca, type: 2}
+  _playerOne: {r: 0.8584906, g: 0.8584906, b: 0.8584906, a: 1}
+  _playerTwo: {r: 0.24528301, g: 0.24528301, b: 0.24528301, a: 1}
+  _red: {r: 1, g: 0.3325764, b: 0.26886788, a: 1}
+  _blue: {r: 0.22352937, g: 0.6325609, b: 1, a: 1}
+  _white: {r: 0.8679245, g: 0.8679245, b: 0.8679245, a: 1}
+  _black: {r: 0.2264151, g: 0.2264151, b: 0.2264151, a: 1}
+  _orange: {r: 0.8490566, g: 0.48954248, b: 0.28435388, a: 1}
+  _green: {r: 0.45755324, g: 0.8773585, b: 0.45109472, a: 1}
+  _cyan: {r: 0.44281775, g: 0.8773585, b: 0.848828, a: 1}
+  _violet: {r: 0.62800723, g: 0.38203096, b: 0.8018868, a: 1}
+  CountColorPlayerOne: 0
+  CountColorPlayerTwo: 1

@@ -49,5 +49,33 @@
   "ws_modifi_resistance": "Увеличивает: Сопротивление урону на 50%.",
 
   "ws_eat_info_onetry": "Колличество на игрока: 1",
-  "ws_eat_info_twotry": "Колличество на игрока: 2"
+  "ws_eat_info_twotry": "Колличество на игрока: 2",
+
+  "player_one_name": "Первый",
+  "player_two_name": "Второй",
+
+  "game_turn": "Ходит",
+
+  "ui_color_red": "Красный",
+  "ui_color_blue": "Синий",
+  "ui_color_white": "Белый",
+  "ui_color_black": "Черный",
+  "ui_color_orange": "Оранжевый",
+  "ui_color_green": "Зелёный",
+  "ui_color_cyan": "Голубой",
+  "ui_color_violet": "Фиолетовый",
+
+  "win": "Победил",
+
+  "selectgame": "Выбрать игру",
+  "selectgame_ws": "Деревянные Самураи",
+  "selectgame_checkers": "Шашки",
+
+  "play_whogoesfirst": "Кто первый ходит?",
+
+  "menu_color_playes": "Цвет Игроков",
+  "menu_color_playerone": "Первый Игрок",
+  "menu_color_playertwo": "Второй Игрок",
+
+  "draw": "Ничья"
 }

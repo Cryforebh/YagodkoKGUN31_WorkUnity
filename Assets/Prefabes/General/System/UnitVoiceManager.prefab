@@ -1,0 +1,61 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3795217110041954958
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7886413508008293567}
+  - component: {fileID: 6802290249549097673}
+  m_Layer: 0
+  m_Name: UnitVoiceManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7886413508008293567
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3795217110041954958}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6802290249549097673
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3795217110041954958}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8216854d7d4aa344e9abaca4877fef59, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _bSoundsSelect:
+  - {fileID: 8300000, guid: 40aa9ec0af67e224b8dc10e6a6e49ed3, type: 3}
+  - {fileID: 8300000, guid: 2c37f0108cdd4b048a9180ea7682c2fb, type: 3}
+  - {fileID: 8300000, guid: 0812b3ebb5b0dd346aeecfdc1b03a8c4, type: 3}
+  - {fileID: 8300000, guid: afa8954baff322146948618a66f262f4, type: 3}
+  - {fileID: 8300000, guid: 7aef3f2187e96a54f88b1021ba6f1c31, type: 3}
+  _bSoundsGoCell:
+  - {fileID: 8300000, guid: 177f1b041ff019d4f84181e26099678d, type: 3}
+  - {fileID: 8300000, guid: bafeaeed80ec4a649a2c000b58cd2589, type: 3}
+  - {fileID: 8300000, guid: 2fa1a1c1c3a2fd549969dad15b429846, type: 3}
+  - {fileID: 8300000, guid: 13706acc897c4b747a4f10740c69d6e4, type: 3}
+  _bSoundsDead:
+  - {fileID: 8300000, guid: e8fc797a3132cf048abbed59bdba3ef7, type: 3}
+  - {fileID: 8300000, guid: 0eb6f7928774a894dbaa0b33a853c3ee, type: 3}
+  - {fileID: 8300000, guid: d3a054440285903469cfc56ac3d20b33, type: 3}

@@ -52,4 +52,32 @@ public class LocalizationData
 
     public string ws_eat_info_onetry;
     public string ws_eat_info_twotry;
+
+    public string player_one_name;
+    public string player_two_name;
+
+    public string game_turn;
+
+    public string ui_color_red;
+    public string ui_color_blue;
+    public string ui_color_white;
+    public string ui_color_black;
+    public string ui_color_orange;
+    public string ui_color_green;
+    public string ui_color_cyan;
+    public string ui_color_violet;
+
+    public string win;
+
+    public string selectgame;
+    public string selectgame_ws;
+    public string selectgame_checkers;
+
+    public string play_whogoesfirst;
+
+    public string menu_color_playes;
+    public string menu_color_playerone;
+    public string menu_color_playertwo;
+
+    public string draw;
 }

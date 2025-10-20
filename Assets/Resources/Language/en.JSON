@@ -49,5 +49,32 @@
   "ws_modifi_resistance": "Increases: Damage resistance by 50 %",
 
   "ws_eat_info_onetry": "Number per player: 1",
-  "ws_eat_info_twotry": "Number per player: 2"
+  "ws_eat_info_twotry": "Number per player: 2",
+
+  "player_one_name": "One",
+  "player_two_name": "Two",
+
+  "game_turn": "Turn",
+
+  "ui_color_red": "Red",
+  "ui_color_blue": "Blue",
+  "ui_color_white": "White",
+  "ui_color_black": "Black",
+  "ui_color_orange": "Orange",
+  "ui_color_green": "Green",
+  "ui_color_cyan": "Cyan",
+  "ui_color_violet": "Violet",
+
+  "win": "Won",
+  "selectgame": "Select Game",
+  "selectgame_ws": "Wooden Samurai",
+  "selectgame_checkers": "Checkers",
+
+  "play_whogoesfirst": "Who Goes First?",
+
+  "menu_color_playes": "Players' Color",
+  "menu_color_playerone": "First Player",
+  "menu_color_playertwo": "Second Player",
+
+  "draw": "Draw"
 }
