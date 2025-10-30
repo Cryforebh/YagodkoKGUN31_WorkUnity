@@ -42,6 +42,11 @@ public class C_PlayerController : MonoBehaviour
         }
     }
 
+    public void ForcedMoveUnit(EnumGameEvent gameEvent)
+    {
+        MoveUnit(gameEvent);
+    }
+
     private void OnDestroy()
     {
         _signalBus.Unsubscribe<EnumGameEvent>(MoveUnit);

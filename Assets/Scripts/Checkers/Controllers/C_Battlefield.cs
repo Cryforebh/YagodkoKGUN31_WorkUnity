@@ -366,10 +366,12 @@ public class C_Battlefield : MonoBehaviour
                 if (cell.CurrentUnit.IsDamka == false)
                 {
                     all = FindDiagonalCells(cell, _allCells);
+                    all.AddRange(_availableAttackCells);
                 }
                 else
                 {
                     all = FindAllDiagonalCells(cell, _allCells);
+                    all.AddRange(_availableAttackCells);
                 }
             }
         }

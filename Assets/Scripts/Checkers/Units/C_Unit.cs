@@ -31,6 +31,7 @@ public class C_Unit : MonoBehaviour, IUnitMain, IUnitVoice, IPointerEnterHandler
     private Material _dontEnterMaterialCloth;
     private bool _isEnemy = false;
     private bool _damka = false;
+    private bool _death = false;
 
     public C_Cell Cell { get => _currentCell; set => _currentCell = value; }
     public MeshRenderer MeshRendererCloth { get => _meshRendererCloth; set => _meshRendererCloth = value; }
@@ -124,6 +125,9 @@ public class C_Unit : MonoBehaviour, IUnitMain, IUnitVoice, IPointerEnterHandler
 
     public void Death()
     {
+        if (_death) return;
+
+        _death = true;
         Cell.ClearUnit(this);
         Debug.Log($"¬ражеский персонаж {this} - убит, и удален из своей клетки {Cell}.");
 

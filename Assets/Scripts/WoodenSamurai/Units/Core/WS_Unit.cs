@@ -42,6 +42,7 @@ public abstract class WS_Unit : MonoBehaviour, IUnitMain, IUnitVoice
     private WS_EnumStatusUnitEnemy _statusUnit;
     private WS_EnumStatusUnitClass _class;
 
+    public WS_Cell CurrentCell { get; set; }
     public float GetDamage => _modifierDamage + _baseDamage + _baseStrength + _weaponDamage;
     public float GetStrength => _baseStrength;
     public float Health { get => _currentHealth; protected set => _currentHealth = value; }
@@ -195,15 +196,16 @@ public abstract class WS_Unit : MonoBehaviour, IUnitMain, IUnitVoice
 
         HitDamageUnitEvent?.Invoke(this);
 
-        if (_currentHealth <= 0) Dead(this);
+        if (_currentHealth <= 0) Death();
     }
 
-    private void Dead(WS_Unit unitDead)
+    public void Death()
     {
         if (IsDead) return; // Защита от повторного вызова
 
         DeadUnitEvent?.Invoke(this);
         IsDead = true;
+        CurrentCell.ClearUnit();
 
         StartCoroutine(DeathProcess());
     }
@@ -221,7 +223,7 @@ public abstract class WS_Unit : MonoBehaviour, IUnitMain, IUnitVoice
 
         yield return new WaitForSeconds(0.5f);
 
-        Debug.Log($"{this.name}: Умер окончательно!");
+        Debug.Log($"{name}: Умер окончательно!");
         gameObject.SetActive(false);
     }
 

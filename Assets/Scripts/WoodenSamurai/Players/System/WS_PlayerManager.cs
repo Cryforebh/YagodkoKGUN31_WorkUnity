@@ -60,6 +60,8 @@ public class WS_PlayerManager : MonoBehaviour, IPlayerManager
     /// <returns></returns>
     public EnumPlayers? CheckWinner()
     {
+        if (_win == true || _draw == true) return null;
+
         // Фильтруем игроков с юнитами, исключая None
         var activePlayers = GetPlayersWhithUnits();
 

@@ -105,6 +105,8 @@ public class C_PlayerManager : MonoBehaviour, IPlayerManager
 
     private void EndGame(EnumPlayers player, string message)
     {
+        if (_draw || _win) return;
+
         _gameData.Lock = true;
         _gameData.LockClick = true;
         _draw = player == EnumPlayers.None;

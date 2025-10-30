@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -32,60 +33,37 @@ public class MenuColorPlayerUpdate : MonoBehaviour
         UpdateCount();
     }
 
+    // Тут я применил новый, для себя, способ реализации цикла Switch
     private void UpdateLanguage()
     {
         _list = _dropdown.options;
 
         for (int i = 0; i < _list.Count; i++)
         {
-            switch (i)
+            _list[i].text = i switch 
             {
-                case 0:
-                    _list[i].text = _localization.GetText(EnumTextLocalization.ui_color_red);
-                    break;
-                case 1:
-                    _list[i].text = _localization.GetText(EnumTextLocalization.ui_color_blue);
-                    break;
-                case 2:
-                    _list[i].text = _localization.GetText(EnumTextLocalization.ui_color_white);
-                    break;
-                case 3:
-                    _list[i].text = _localization.GetText(EnumTextLocalization.ui_color_black);
-                    break;
-                case 4:
-                    _list[i].text = _localization.GetText(EnumTextLocalization.ui_color_orange);
-                    break;
-                case 5:
-                    _list[i].text = _localization.GetText(EnumTextLocalization.ui_color_green);
-                    break;
-                case 6:
-                    _list[i].text = _localization.GetText(EnumTextLocalization.ui_color_cyan);
-                    break;
-                case 7:
-                    _list[i].text = _localization.GetText(EnumTextLocalization.ui_color_violet);
-                    break;
-                default:
-                    break;
-            }
+                0 => _localization.GetText(EnumTextLocalization.ui_color_red),
+                1 => _localization.GetText(EnumTextLocalization.ui_color_blue),
+                2 => _localization.GetText(EnumTextLocalization.ui_color_white),
+                3 => _localization.GetText(EnumTextLocalization.ui_color_black),
+                4 => _localization.GetText(EnumTextLocalization.ui_color_orange),
+                5 => _localization.GetText(EnumTextLocalization.ui_color_green),
+                6 => _localization.GetText(EnumTextLocalization.ui_color_cyan),
+                7 => _localization.GetText(EnumTextLocalization.ui_color_violet),
+                _ => "Dont is Color"
+            };
         }
-
         _dropdown.captionText.text = _list[_dropdown.value].text;
     }
 
     private void UpdateCount()
     {
-        switch (_player)
+        _dropdown.value = _player switch
         {
-            case EnumPlayers.PlayerOne:
-                _dropdown.value = _colorPlayersManager.CountColorPlayerOne;
-                break;
-            case EnumPlayers.PlayerTwo:
-                _dropdown.value = _colorPlayersManager.CountColorPlayerTwo;
-                break;
-            default:
-                break;
-        }
-
+            EnumPlayers.PlayerOne => _colorPlayersManager.CountColorPlayerOne,
+            EnumPlayers.PlayerTwo => _colorPlayersManager.CountColorPlayerTwo,
+            _ => throw new ArgumentException($"Неизвестный игрок: {_player}")
+        };
     }
 
     private void OnDestroy()

@@ -6,4 +6,6 @@ public interface IUnitMain
     public bool IsEnemy { get; set; }
 
     public Transform CurrentTransform { get; }
+
+    public void Death();
 }

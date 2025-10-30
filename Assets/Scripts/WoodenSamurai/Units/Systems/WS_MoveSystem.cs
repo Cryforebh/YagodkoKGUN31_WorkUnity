@@ -412,7 +412,8 @@ public class WS_MoveSystem : MonoBehaviour
             //_soundUnit = _soundUnit.GetAudioSource(_targetActionUnit);
             //_soundUnit.SoundPlay()
 
-            _targetActionCell.ClearUnit();
+            //_targetActionCell.ClearUnit();
+            _targetActionUnit.Death();
             Debug.Log($"{_targetActionUnit.name} принадлежащий {_targetActionUnit.Player} - Пал в бою!");
         }
 

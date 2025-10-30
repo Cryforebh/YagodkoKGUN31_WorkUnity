@@ -170,7 +170,10 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 2fa1a1c1c3a2fd549969dad15b429846, type: 3}
   - {fileID: 8300000, guid: 13706acc897c4b747a4f10740c69d6e4, type: 3}
   _bSoundsAttack:
+  - {fileID: 8300000, guid: e82c4a89d99955545bef9a6942f73a8e, type: 3}
+  - {fileID: 8300000, guid: 659cc384cb9017143b4a53a59cd3eef3, type: 3}
   - {fileID: 8300000, guid: c5d8e390007b8dd4e8e762aef035fde1, type: 3}
+  - {fileID: 8300000, guid: 659cc384cb9017143b4a53a59cd3eef3, type: 3}
   _bSoundsDead:
   - {fileID: 8300000, guid: e8fc797a3132cf048abbed59bdba3ef7, type: 3}
   - {fileID: 8300000, guid: 0eb6f7928774a894dbaa0b33a853c3ee, type: 3}

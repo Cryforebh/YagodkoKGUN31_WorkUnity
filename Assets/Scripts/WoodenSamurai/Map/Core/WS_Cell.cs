@@ -54,7 +54,11 @@ public class WS_Cell : MonoBehaviour, IPointerEnterHandler, IPointerClickHandler
 
     private void Start()
     {
-        if (!CurrentUnit && _createUnit) CurrentUnit = _installedStartUnit;
+        if (!CurrentUnit && _createUnit)
+        {
+            CurrentUnit = _installedStartUnit;
+        }
+
         ResetAll();
     }
 
@@ -89,6 +93,7 @@ public class WS_Cell : MonoBehaviour, IPointerEnterHandler, IPointerClickHandler
     {
         SetModifier(unit);
         CurrentUnit = unit;
+        unit.CurrentCell = this;
     }
     public void ClearUnit()
     {
