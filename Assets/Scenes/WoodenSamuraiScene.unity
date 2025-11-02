@@ -31397,6 +31397,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 356792463179707845, guid: f58266a4ef387ce498a87f1fe15266f2, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.34
+      objectReference: {fileID: 0}
     - target: {fileID: 1191360495647657761, guid: f58266a4ef387ce498a87f1fe15266f2, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -31404,6 +31408,14 @@ PrefabInstance:
     - target: {fileID: 4630962718160704267, guid: f58266a4ef387ce498a87f1fe15266f2, type: 3}
       propertyPath: m_Name
       value: Interior
+      objectReference: {fileID: 0}
+    - target: {fileID: 4850824536485461161, guid: f58266a4ef387ce498a87f1fe15266f2, type: 3}
+      propertyPath: m_Shadows.m_Type
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4850824536485461161, guid: f58266a4ef387ce498a87f1fe15266f2, type: 3}
+      propertyPath: m_Shadows.m_NearPlane
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 6312428963951755438, guid: f58266a4ef387ce498a87f1fe15266f2, type: 3}
       propertyPath: m_LocalPosition.x

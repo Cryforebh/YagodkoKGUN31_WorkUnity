@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using Debug = UnityEngine.Debug;
 
+#if UNITY_EDITOR
+
 /// <summary>
 /// Окно читов
 /// </summary>
@@ -14,7 +16,7 @@ public class EditorCheckersCheatWindow : EditorWindow
     private bool _isPlayMode = false;
 
 
-    [MenuItem("Cheats/Windows/EditorCheckersCheatWindow", priority = 1)]
+    [MenuItem("WoodenSamurai/Windows/Cheats/EditorCheckersCheatWindow", priority = 1)]
     public static void ShowExample()
         => GetWindow<EditorCheckersCheatWindow>(false, "Editor Checkers Cheat Window ", true);
 
@@ -175,3 +177,4 @@ public class EditorCheckersCheatWindow : EditorWindow
         return true;
     }
 }
+#endif

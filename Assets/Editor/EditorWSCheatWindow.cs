@@ -2,12 +2,13 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+#if UNITY_EDITOR
 public class EditorWSCheatWindow : EditorWindow
 {
     private EditorControls _controls;
     private bool _isPlayMode = false;
 
-    [MenuItem("Cheats/Windows/EditorWSCheatWindow", priority = 1)]
+    [MenuItem("WoodenSamurai/Windows/Cheats/EditorWSCheatWindow", priority = 1)]
     public static void ShowExample()
         => GetWindow<EditorWSCheatWindow>(false, "Editor WoodenSamurai Cheat Window ", true);
 
@@ -166,3 +167,5 @@ public class EditorWSCheatWindow : EditorWindow
         return true;
     }
 }
+
+#endif

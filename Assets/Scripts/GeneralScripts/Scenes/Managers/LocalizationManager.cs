@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
+
 
 public class LocalizationManager : MonoBehaviour
 {
@@ -7,6 +9,8 @@ public class LocalizationManager : MonoBehaviour
 
     private string _language = "en";
     private int _currentCountLanguage = 0;
+
+    private Dictionary<string, string> _translationsTest = new Dictionary<string, string>();
 
     public int GetCurrentCountLanguage => _currentCountLanguage;
     public event Action<int> ChangeLanguageEvent;
@@ -29,6 +33,7 @@ public class LocalizationManager : MonoBehaviour
         }
         _currentCountLanguage = count;
         LoadTranslations(_language);
+        //LoadTranslationsTest("test");
         ChangeLanguageEvent?.Invoke(_currentCountLanguage);
     }
 
@@ -53,6 +58,57 @@ public class LocalizationManager : MonoBehaviour
         else
         {
             Debug.LogError("Файл переводов не найден!");
+        }
+    }
+
+    /// <summary>
+    /// Не работает, из за ограничений в JsonUtility с Dictionary...
+    /// </summary>
+    /// <param name="language"></param>
+    private void LoadTranslationsTest(string language)
+    {
+        // Загружаем текст из ресурса
+        TextAsset textAsset = Resources.Load<TextAsset>($"Language/{language}");
+
+        if (textAsset != null)
+        {
+            // Получаем строку JSON из TextAsset
+            string json = textAsset.text;
+
+            // Преобразуем JSON в объект C#
+            _translationsTest = JsonUtility.FromJson<Dictionary<string, string>>(json);
+
+            if (_translationsTest.Count > 0)
+            {
+                foreach (var item in _translationsTest)
+                {
+                    Debug.LogWarning($"{item.Value}");
+                }
+            }
+            else Debug.LogWarning($"В {_translationsTest} - {_translationsTest.Count} значений.");
+        }
+        else
+        {
+            Debug.LogError("Файл переводов не найден!");
+        }
+    }
+
+    /// <summary>
+    /// Не работает, из за ограничений в JsonUtility с Dictionary...
+    /// </summary>
+    /// <param name="language"></param>
+    public string GetTextTest(string key)
+    {
+        if (_translationsTest.ContainsKey(key))
+        {
+            Debug.LogWarning($"{_translationsTest[key]} - test");
+            return _translationsTest[key];
+        }
+        else
+        {
+            Debug.LogWarning($"{_translationsTest.Count} - test");
+
+            return key; // Возвращаем ключ, если перевод не найден
         }
     }
 
