@@ -10,6 +10,7 @@ public class GameMenu : StandardMenu
 {
     [Inject] private ColorPlayersManager _colorPlayerManager;
     [Inject] private ISpawner _spawner;
+    [Inject] private GameEvent _gameEvent;
 
     private SceneController _sceneController;
     private InputManager _inputManager;
@@ -63,7 +64,7 @@ public class GameMenu : StandardMenu
 
     private void Start()
     {
-        _inputManager.Controls.Game.Menu.canceled += _ => ButtonBack();
+        _inputManager.Controls.Game.Menu.performed += _ => ButtonBack();
     }
 
     [Inject]
@@ -114,6 +115,8 @@ public class GameMenu : StandardMenu
 
         if (_menu.activeSelf == false)
         {
+            if (_gameEvent.Status == EnumGameEvent.SelectedUnit) return;
+
             _menu.SetActive(true);
             CameraMenuShow(true);
 
@@ -359,6 +362,6 @@ public class GameMenu : StandardMenu
 
     private void OnDestroy()
     {
-        _inputManager.Controls.Game.Menu.canceled -= _ => ButtonBack();
+        _inputManager.Controls.Game.Menu.performed -= _ => ButtonBack();
     }
 }

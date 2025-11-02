@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using Zenject;
@@ -96,8 +95,7 @@ public class C_Unit : MonoBehaviour, IUnitMain, IUnitVoice, IPointerEnterHandler
         if (_meshRendererCloth == null)
         {
             Debug.LogError($"У {this} - нет Меш Рендера _meshRendererCloth, Дочерний обьект пустой!");
-            this.IsDestroyed();
-            this.OnDestroy();
+            OnDestroy();
             return;
         }
 

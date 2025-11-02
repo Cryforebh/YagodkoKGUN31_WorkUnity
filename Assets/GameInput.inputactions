@@ -74,6 +74,17 @@
                 },
                 {
                     "name": "",
+                    "id": "a6b58f1b-df7a-4882-ae30-54a7a16bc01d",
+                    "path": "<Keyboard>/tab",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Restart",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "514e181f-2922-42cc-a29c-1690a4de5713",
                     "path": "<Keyboard>/escape",
                     "interactions": "",

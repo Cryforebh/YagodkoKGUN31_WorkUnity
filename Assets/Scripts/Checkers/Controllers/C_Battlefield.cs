@@ -126,26 +126,17 @@ public class C_Battlefield : MonoBehaviour
         if (_gameEvent.Status >= EnumGameEvent.SelectedCell) return;
         if (unit.IsEnemy) return;
 
-        //VisibleAvailableCells(false);
-        //CheckAvailableCells(unit.Cell, unit);
-        //if (_availableCells.Count == 0 && _availableAttackCells.Count == 0)
-        //{
-        //    unit.MeshRendererCloth.material = unit.DontEnterMaterialCloth;
-        //    _animatedCursor.SetCursorState(EnumStatusCursor.Default);
-        //}
-        //else
-        //{
-            unit.MeshRendererCloth.material = unit.EnterMaterialCloth;
-            _animatedCursor.SetCursorState(EnumStatusCursor.Select);
-        //}
+        unit.MeshRendererCloth.material = unit.EnterMaterialCloth;
+        _animatedCursor.SetCursorState(EnumStatusCursor.Select);
     }
 
     private void UnitExit(C_Unit unit)
     {
         _animatedCursor.SetCursorState(EnumStatusCursor.Default);
 
-        if (unit.IsEnemy) return;
         _unitEnter = null;
+
+        if (unit.IsEnemy) return;
 
         if (_oldUnit == unit) return;
 
@@ -155,7 +146,7 @@ public class C_Battlefield : MonoBehaviour
 
     private void UnitClick(C_Unit unit)
     {
-        _unitEnter = null;
+        //_unitEnter = null;
 
         // Если событие — выбор клетки, то метод завершается без дальнейших действий.
         if (_gameEvent.Status >= EnumGameEvent.SelectedCell) return;
@@ -189,7 +180,7 @@ public class C_Battlefield : MonoBehaviour
             return;
         }
 
-        // Если игровое событие Empty, то обрабатываем выбор юнита:
+        // Если Empty, то обрабатываем выбор юнита:
         if (_gameEvent.Status == EnumGameEvent.Empty)
         {
             // Запоминаем клетку, на которой находится выбранный юнит.
@@ -235,19 +226,7 @@ public class C_Battlefield : MonoBehaviour
         // Если выбран тот же юнит снова, то снимаем выбор:
         else if (_oldUnit == unit)
         {
-
-            Debug.Log("Выбор Юнита - Снят.");
-            _gameEvent.StatusUpdate(EnumGameEvent.Empty);
-
-            // Скрываем доступные клетки.
-            VisibleAvailableCells(false);
-
-            _signalBus.Fire(_gameEvent.Status);
-
-            // Обнуляем ссылки на старый юнит и клетку.
-            _oldUnit = null;
-            _oldCell = null;
-            Debug.Log("Информация о старом Юните очищенна.");
+            DeselectUnit();
         }
     }
 
@@ -345,6 +324,26 @@ public class C_Battlefield : MonoBehaviour
         {
             cell.RenderEnter.material = cell.OldMaterial;
             _animatedCursor.SetCursorState(EnumStatusCursor.Default);
+        }
+    }
+
+    public void DeselectUnit()
+    {
+        if (EnumGameEvent.SelectedUnit == _gameEvent.Status)
+        {
+            Debug.Log("Выбор Юнита - Снят.");
+            _gameEvent.StatusUpdate(EnumGameEvent.Empty);
+            _oldUnit.MeshRendererCloth.material = _oldUnit.OldMaterialCloth;
+
+            // Скрываем доступные клетки.
+            VisibleAvailableCells(false);
+
+            _signalBus.Fire(_gameEvent.Status);
+
+            // Обнуляем ссылки на старый юнит и клетку.
+            _oldUnit = null;
+            _oldCell = null;
+            Debug.Log("Информация о старом Юните очищенна.");
         }
     }
 
@@ -850,15 +849,6 @@ public class C_Battlefield : MonoBehaviour
     {
         ResetMaterialCell();
 
-        if (_availableCells != null)
-        {
-            foreach (var targetCell in _availableCells)
-            {
-                targetCell.RenderEnter.enabled = vision;
-                if (vision) targetCell.OldMaterial = targetCell.ShowEnterMaterial;
-            }
-        }
-
         if (_availableAttackCells != null)
         {
             foreach (var targetcell in _availableAttackCells)
@@ -869,6 +859,17 @@ public class C_Battlefield : MonoBehaviour
                     targetcell.OldMaterial = targetcell.ShowEnemyMaterial;
                     targetcell.RenderEnter.material = targetcell.OldMaterial;
                 }
+            }
+
+            //if (_availableAttackCells.Count > 0) return;
+        }
+
+        if (_availableCells != null)
+        {
+            foreach (var targetCell in _availableCells)
+            {
+                targetCell.RenderEnter.enabled = vision;
+                if (vision) targetCell.OldMaterial = targetCell.ShowEnterMaterial;
             }
         }
     }

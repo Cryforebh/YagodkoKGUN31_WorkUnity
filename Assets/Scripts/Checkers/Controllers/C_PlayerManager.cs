@@ -113,6 +113,7 @@ public class C_PlayerManager : MonoBehaviour, IPlayerManager
         _win = player != EnumPlayers.None;
         Debug.Log(message);
         OnWinnerDeclared?.Invoke(player);
+
     }
 
     public List<EnumPlayers> GetPlayersWhithUnits()
