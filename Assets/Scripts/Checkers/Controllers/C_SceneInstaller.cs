@@ -9,6 +9,7 @@ public class C_SceneInstaller : MonoInstaller
     [SerializeField] private C_Battlefield _battlefield;
     [SerializeField] private VoiceUnitManager _voiceUnitManager;
     [SerializeField] private BoomEffectController _boomEffectController;
+    [SerializeField] private C_Setting _setting;
     //[SerializeField] private ColorPlayersManager _colorPlayersContainer;
 
     public override void InstallBindings()
@@ -23,6 +24,7 @@ public class C_SceneInstaller : MonoInstaller
         Container.BindInstance(_playerController).AsSingle();
         Container.BindInstance(_voiceUnitManager).AsSingle();
         Container.BindInstance(_boomEffectController).AsSingle().NonLazy();
+        Container.BindInstance(_setting).AsSingle().NonLazy();
 
         Container.Bind<AllPlayer>().FromNewComponentOnNewGameObject().AsSingle().NonLazy();
         Container.Bind<IPlayerManager>().To<C_PlayerManager>().FromNewComponentOnNewGameObject().AsSingle().NonLazy();

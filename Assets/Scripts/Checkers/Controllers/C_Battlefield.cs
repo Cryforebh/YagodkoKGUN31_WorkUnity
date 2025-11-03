@@ -11,6 +11,7 @@ public class C_Battlefield : MonoBehaviour
     [Inject] private AdvancedCursorController _animatedCursor;
     [Inject] private IGameData _gameData;
     [Inject] private VoiceUnitManager _voiceUnit;
+    [Inject] private C_Setting _setting;
 
     private C_Cell[,] _allCells = new C_Cell[8, 8];
     private C_Unit _unitEnter;
@@ -18,11 +19,14 @@ public class C_Battlefield : MonoBehaviour
     private C_Cell _selectCell;
     private C_Cell _oldCell;
 
-    private bool _isCursorEnterTarget = false;
-
     private List<C_Cell> _availableCells;
     private List<C_Cell> _availableAttackCells;
     private List<C_Cell> _availableEmemyCells;
+    private List<C_Unit> _availableUnitsAttack;
+
+    private bool _isCursorEnterTarget;
+
+    public bool IsAvailableCellPlayer { get; set; }
 
     private void Start()
     {
@@ -79,19 +83,9 @@ public class C_Battlefield : MonoBehaviour
     }
 
     public C_Cell[,] AllCell => _allCells;
-    public List<C_Cell> AvailableAttackCells => _availableEmemyCells;
     public C_Cell GetSelectedCell => _selectCell;
     public C_Cell GetOldCell => _oldCell;
     public C_Unit GetUnit => _oldUnit;
-
-    public C_Cell GetCellCurrentUnit(C_Unit unit)
-    {
-        foreach (C_Cell cell in _allCells)
-        {
-            if (cell.CurrentUnit == unit) return cell;
-        }
-        return null;
-    }
 
     public void AddUnitInCell(C_Unit unit, C_Cell oldcell, C_Cell targetcell)
     {
@@ -106,23 +100,16 @@ public class C_Battlefield : MonoBehaviour
         Debug.Log($"Персонаж {unit} - добавлен в выбранную клетку {targetcell} и удален из старой {oldcell}.");
     }
 
-    public C_Unit GetUnitFromCell(C_Cell cell)
-    {
-        foreach (C_Cell targetcell in _allCells)
-        {
-            if (cell.CurrentUnit == targetcell.CurrentUnit) return cell.CurrentUnit;
-        }
-        return null;
-    }
-
     private void UnitEnter(C_Unit unit)
     {
         _unitEnter = unit;
-        ProccesEnter(unit);
+        ProccesUnitEnter(unit);
     }
 
-    private void ProccesEnter(C_Unit unit)
+    private void ProccesUnitEnter(C_Unit unit)
     {
+        if (_gameData.Lock) return;
+
         if (_gameEvent.Status >= EnumGameEvent.SelectedCell) return;
         if (unit.IsEnemy) return;
 
@@ -140,12 +127,17 @@ public class C_Battlefield : MonoBehaviour
 
         if (_oldUnit == unit) return;
 
-        unit.MeshRendererCloth.material = unit.OldMaterialCloth;
+        if (unit.IsIlluminated)
+        {
+            unit.MeshRendererCloth.material = unit.IlluminatedAvailableMaterialCloth;
+        }
+        else unit.MeshRendererCloth.material = unit.OldMaterialCloth;
 
     }
 
     private void UnitClick(C_Unit unit)
     {
+        if (_gameData.Lock || _gameData.LockClick) return;
         //_unitEnter = null;
 
         // Если событие — выбор клетки, то метод завершается без дальнейших действий.
@@ -154,18 +146,28 @@ public class C_Battlefield : MonoBehaviour
         // Если выбранный юнит является вражеским, метод также завершается.
         if (unit.IsEnemy) return;
 
+        //unit.IsIlluminated = false;
+        VisibleAvailableUnit(false);
         // Скрываем доступные клетки на игровом поле.
         VisibleAvailableCells(false);
         // Проверяем доступные клетки для перемещения/атаки для выбранного юнита.
-        CheckAvailableCells(unit.Cell, unit);
+        //CheckAvailableCells(unit.Cell, unit);
+        CheckUnitAvailableCells(unit);
         // Проверяем, есть ли доступные клетки для перемещения или атаки.
         if (_availableCells.Count == 0 && _availableAttackCells.Count == 0)
         {
+            // Новый процесс - Подсвечивание доступных для хода юнитов
+            VisibleAvailableUnit(true);
+
             //_voiceUnit.VoicePlayDontActive();
             // Если доступных клеток нет и был ранее выбранный юнит, то:
             if (_oldUnit != null)
             {
-                _oldUnit.MeshRendererCloth.material = _oldUnit.OldMaterialCloth;
+                if (!_oldUnit.IsIlluminated)
+                {
+                    _oldUnit.MeshRendererCloth.material = _oldUnit.OldMaterialCloth;
+                }
+
                 _gameEvent.StatusUpdate(EnumGameEvent.Empty);
 
                 VisibleAvailableCells(false);
@@ -183,6 +185,8 @@ public class C_Battlefield : MonoBehaviour
         // Если Empty, то обрабатываем выбор юнита:
         if (_gameEvent.Status == EnumGameEvent.Empty)
         {
+            unit.MeshRendererCloth.material = unit.EnterMaterialCloth;
+
             // Запоминаем клетку, на которой находится выбранный юнит.
             _oldCell = unit.Cell;
 
@@ -205,7 +209,8 @@ public class C_Battlefield : MonoBehaviour
         // Если уже выбран юнит и выбран новый юнит (не тот же самый), то:
         else if (_gameEvent.Status == EnumGameEvent.SelectedUnit && _oldUnit != unit)
         {
-            _oldUnit.MeshRendererCloth.material = _oldUnit.OldMaterialCloth;
+            if (_oldUnit.IsIlluminated == true) _oldUnit.IsIlluminated = false;
+            else _oldUnit.MeshRendererCloth.material = _oldUnit.OldMaterialCloth;
 
             // Запоминаем новую клетку и юнит.
             _oldCell = unit.Cell;
@@ -347,7 +352,7 @@ public class C_Battlefield : MonoBehaviour
         }
     }
 
-    public bool CheckAvailableAllCells(EnumPlayers player)
+    public void CheckAvailableAllCells(EnumPlayers player)
     {
         _availableCells = null;
         _availableAttackCells = null;
@@ -355,47 +360,67 @@ public class C_Battlefield : MonoBehaviour
         _availableCells = new List<C_Cell>();
         _availableAttackCells = new List<C_Cell>();
         _availableEmemyCells = new List<C_Cell>();
+
+        _availableUnitsAttack = new List<C_Unit>();
 
         var all = new List<C_Cell>();
         foreach (C_Cell cell in _allCells)
         {
-            if (all.Count > 0) return true;
-            if (cell.CurrentUnit != null && cell.CurrentUnit.Player == player)
+            var unit = cell.CurrentUnit;
+
+            if (unit != null && unit.Player == player)
             {
-                if (cell.CurrentUnit.IsDamka == false)
+                unit.AvailableCells = new List<C_Cell>();
+                unit.AvailableAttackCells = new List<C_Cell>();
+
+                if (unit.IsDamka == false)
                 {
-                    all = FindDiagonalCells(cell, _allCells);
-                    all.AddRange(_availableAttackCells);
+                    unit.AvailableAttackCells.AddRange(FindDiagonalEnemyCells(cell, _allCells));
+                    all.AddRange(unit.AvailableAttackCells);
+
+                    if (unit.AvailableAttackCells.Count > 0 && _setting.IsNecessaryToAttack == true) _availableUnitsAttack.Add(unit);
+                    else
+                    {
+                        unit.AvailableCells.AddRange(FindDiagonalCells(cell, _allCells));
+                        all.AddRange(unit.AvailableCells);
+                    }
                 }
                 else
                 {
-                    all = FindAllDiagonalCells(cell, _allCells);
-                    all.AddRange(_availableAttackCells);
+                    unit.AvailableAttackCells.AddRange(FindDamkaDiagonalEnemyCells(cell, _allCells));
+                    all.AddRange(unit.AvailableAttackCells);
+
+                    if (unit.AvailableAttackCells.Count > 0 && _setting.IsNecessaryToAttack == true) _availableUnitsAttack.Add(unit);
+                    else
+                    {
+                        unit.AvailableCells.AddRange(FindDamkaDiagonalCells(cell, _allCells));
+                        all.AddRange(unit.AvailableCells);
+                    }
                 }
             }
         }
-        return false;
+
+        if (_availableUnitsAttack.Count > 0 && _setting.IsNecessaryToAttack == true)
+        {
+            foreach (C_Cell cell in _allCells)
+            {
+                var unit = cell.CurrentUnit;
+
+                if (unit != null && unit.Player == player)
+                {
+                    cell.CurrentUnit.AvailableCells.Clear();
+                }
+            }
+        }
+
+        if (all.Count > 0) IsAvailableCellPlayer = true;
+        if (all.Count == 0) IsAvailableCellPlayer = false;
     }
 
-    private void CheckAvailableCells(C_Cell cell, C_Unit oldUnit)
+    private void CheckUnitAvailableCells(C_Unit unit)
     {
-        _availableCells = null;
-        _availableAttackCells = null;
-
-        _availableCells = new List<C_Cell>();
-        _availableAttackCells = new List<C_Cell>();
-        _availableEmemyCells = new List<C_Cell>();
-
-        if (oldUnit.IsDamka == false)
-        {
-            _availableCells = FindDiagonalCells(cell, _allCells);
-        }
-        else
-        {
-            _availableCells = FindAllDiagonalCells(cell, _allCells);
-        }
-
-        //_availableCells.RemoveAll(cell => _availableAttackCells.Contains(cell));
+        _availableCells = unit.AvailableCells;
+        _availableAttackCells = unit.AvailableAttackCells;
     }
 
     private void CheckAvailableAttackCells(C_Cell cell, C_Unit oldUnit)
@@ -412,7 +437,7 @@ public class C_Battlefield : MonoBehaviour
         }
         else
         {
-            _availableAttackCells = FindAllDiagonalEnemyCells(cell, _allCells);
+            _availableAttackCells = FindDamkaDiagonalEnemyCells(cell, _allCells);
         }
     }
 
@@ -429,64 +454,70 @@ public class C_Battlefield : MonoBehaviour
         int y = targetCell.GetY;
         C_Cell cell;
 
-        bool allowedGoBackPlayerOne = targetCell.CurrentUnit.Player == EnumPlayers.PlayerOne;
-        bool allowedGoBackPlayerTwo = targetCell.CurrentUnit.Player == EnumPlayers.PlayerTwo;
-
         // Проверяем границы массива и добавляем диагональные клетки
 
-        // вниз-вправо
-        if (x < 7 && y < 7)
+        if (targetCell.CurrentUnit.Player == EnumPlayers.PlayerOne)
         {
-            cell = allCells[x + 1, y + 1];
-            // если на клетке нет персонажа
-            if (!cell.CurrentUnit && allowedGoBackPlayerOne) diagonalCells.Add(cell);
-            // если на клетке есть персонаж и он вражеский
-            else if (cell.CurrentUnit && cell.CurrentUnit.IsEnemy && x < 6 && y < 6)
+            // вниз-вправо
+            if (x < 7 && y < 7)
             {
-                // добавляем клетку в массив, где храняться клетки с вражеским персонажем
-                _availableEmemyCells.Add(cell);
-                // если через клетку вражеского персонажа нет другого персонажа
-                if (!allCells[x + 2, y + 2].CurrentUnit)
-                    //diagonalCells.Add(allCells[x + 2, y + 2]);
-                    // добавляем клетку в массив, где храняться клетки находящиеся за вражеским персонажем
-                    _availableAttackCells.Add(allCells[x + 2, y + 2]);
+                cell = allCells[x + 1, y + 1];
+
+                // если на клетке нет персонажа
+                if (!cell.CurrentUnit) diagonalCells.Add(cell);
+
+                // если на клетке есть персонаж и он вражеский
+                else if (cell.CurrentUnit && cell.CurrentUnit.Player == EnumPlayers.PlayerTwo && x < 6 && y < 6)
+                {
+                    // добавляем клетку в массив, где храняться клетки с вражеским персонажем
+                    _availableEmemyCells.Add(cell);
+                    // если через клетку вражеского персонажа нет другого персонажа
+                    if (!allCells[x + 2, y + 2].CurrentUnit)
+                        //diagonalCells.Add(allCells[x + 2, y + 2]);
+                        // добавляем клетку в массив, где храняться клетки находящиеся за вражеским персонажем
+                        _availableAttackCells.Add(allCells[x + 2, y + 2]);
+                }
             }
-        }
-        // вверх-вправо
-        if (x > 0 && y < 7)
-        {
-            cell = allCells[x - 1, y + 1];
-            if (!cell.CurrentUnit && allowedGoBackPlayerOne) diagonalCells.Add(cell);
-            else if (cell.CurrentUnit && cell.CurrentUnit.IsEnemy && x > 1 && y < 6)
+            // вверх-вправо
+            if (x > 0 && y < 7)
             {
-                _availableEmemyCells.Add(cell);
-                if (!allCells[x - 2, y + 2].CurrentUnit)
-                    _availableAttackCells.Add(allCells[x - 2, y + 2]);
+                cell = allCells[x - 1, y + 1];
+                if (!cell.CurrentUnit) diagonalCells.Add(cell);
+                else if (cell.CurrentUnit && cell.CurrentUnit.Player == EnumPlayers.PlayerTwo && x > 1 && y < 6)
+                {
+                    _availableEmemyCells.Add(cell);
+                    if (!allCells[x - 2, y + 2].CurrentUnit)
+                        _availableAttackCells.Add(allCells[x - 2, y + 2]);
+                }
             }
         }
 
-        // вверх-влево
-        if (x > 0 && y > 0)
+
+        if (targetCell.CurrentUnit.Player == EnumPlayers.PlayerTwo)
         {
-            cell = allCells[x - 1, y - 1];
-            if (!cell.CurrentUnit && allowedGoBackPlayerTwo) diagonalCells.Add(cell);
-            else if (cell.CurrentUnit && cell.CurrentUnit.IsEnemy && x > 1 && y > 1)
+            // вверх-влево
+            if (x > 0 && y > 0)
             {
-                _availableEmemyCells.Add(cell);
-                if (!allCells[x - 2, y - 2].CurrentUnit)
-                    _availableAttackCells.Add(allCells[x - 2, y - 2]);
+                cell = allCells[x - 1, y - 1];
+                if (!cell.CurrentUnit) diagonalCells.Add(cell);
+                else if (cell.CurrentUnit && cell.CurrentUnit.Player == EnumPlayers.PlayerOne && x > 1 && y > 1)
+                {
+                    _availableEmemyCells.Add(cell);
+                    if (!allCells[x - 2, y - 2].CurrentUnit)
+                        _availableAttackCells.Add(allCells[x - 2, y - 2]);
+                }
             }
-        }
-        // вниз-влево
-        if (x < 7 && y > 0)
-        {
-            cell = allCells[x + 1, y - 1];
-            if (!cell.CurrentUnit && allowedGoBackPlayerTwo) diagonalCells.Add(cell);
-            else if (cell.CurrentUnit && cell.CurrentUnit.IsEnemy && x < 6 && y > 1)
+            // вниз-влево
+            if (x < 7 && y > 0)
             {
-                _availableEmemyCells.Add(cell);
-                if (!allCells[x + 2, y - 2].CurrentUnit)
-                    _availableAttackCells.Add(allCells[x + 2, y - 2]);
+                cell = allCells[x + 1, y - 1];
+                if (!cell.CurrentUnit) diagonalCells.Add(cell);
+                else if (cell.CurrentUnit && cell.CurrentUnit.Player == EnumPlayers.PlayerOne && x < 6 && y > 1)
+                {
+                    _availableEmemyCells.Add(cell);
+                    if (!allCells[x + 2, y - 2].CurrentUnit)
+                        _availableAttackCells.Add(allCells[x + 2, y - 2]);
+                }
             }
         }
 
@@ -506,12 +537,17 @@ public class C_Battlefield : MonoBehaviour
         int y = targetCell.GetY;
         C_Cell cell;
 
+        EnumPlayers playerEnemy = EnumPlayers.PlayerOne;
+
+        if (targetCell.CurrentUnit.Player == EnumPlayers.PlayerOne) playerEnemy = EnumPlayers.PlayerTwo;
+        else if (targetCell.CurrentUnit.Player == EnumPlayers.PlayerTwo) playerEnemy = EnumPlayers.PlayerOne;
+
         // вниз-вправо
         if (x < 7 && y < 7)
         {
             cell = allCells[x + 1, y + 1];
             // если на клетке есть персонаж и он вражеский
-            if (cell.CurrentUnit && cell.CurrentUnit.IsEnemy && x < 6 && y < 6)
+            if (cell.CurrentUnit && cell.CurrentUnit.Player == playerEnemy && x < 6 && y < 6)
             {
                 // добавляем клетку в массив, где храняться клетки с вражеским персонажем
                 _availableEmemyCells.Add(cell);
@@ -524,7 +560,7 @@ public class C_Battlefield : MonoBehaviour
         if (x > 0 && y < 7)
         {
             cell = allCells[x - 1, y + 1];
-            if (cell.CurrentUnit && cell.CurrentUnit.IsEnemy && x > 1 && y < 6)
+            if (cell.CurrentUnit && cell.CurrentUnit.Player == playerEnemy && x > 1 && y < 6)
             {
                 _availableEmemyCells.Add(cell);
                 if (!allCells[x - 2, y + 2].CurrentUnit)
@@ -535,7 +571,7 @@ public class C_Battlefield : MonoBehaviour
         if (x > 0 && y > 0)
         {
             cell = allCells[x - 1, y - 1];
-            if (cell.CurrentUnit && cell.CurrentUnit.IsEnemy && x > 1 && y > 1)
+            if (cell.CurrentUnit && cell.CurrentUnit.Player == playerEnemy && x > 1 && y > 1)
             {
                 _availableEmemyCells.Add(cell);
                 if (!allCells[x - 2, y - 2].CurrentUnit)
@@ -546,7 +582,7 @@ public class C_Battlefield : MonoBehaviour
         // вниз-влево
         {
             cell = allCells[x + 1, y - 1];
-            if (cell.CurrentUnit && cell.CurrentUnit.IsEnemy && x < 6 && y > 1)
+            if (cell.CurrentUnit && cell.CurrentUnit.Player == playerEnemy && x < 6 && y > 1)
             {
                 _availableEmemyCells.Add(cell);
                 if (!allCells[x + 2, y - 2].CurrentUnit)
@@ -562,7 +598,7 @@ public class C_Battlefield : MonoBehaviour
     /// <param name="targetCell">Клетка, которую выбрали для хода.</param>
     /// <param name="allCells">Массив, содержащий все игровые клетки.</param>
     /// <returns></returns>
-    private List<C_Cell> FindAllDiagonalCells(C_Cell targetCell, C_Cell[,] allCells)
+    private List<C_Cell> FindDamkaDiagonalCells(C_Cell targetCell, C_Cell[,] allCells)
     {
         _availableEmemyCells = new List<C_Cell>();
         bool diagonalWhichEnemy = false;
@@ -571,21 +607,26 @@ public class C_Battlefield : MonoBehaviour
         int x = targetCell.GetX;
         int y = targetCell.GetY;
         C_Cell cell = null;
+        EnumPlayers player = targetCell.CurrentUnit.Player;
+        EnumPlayers playerEnemy = EnumPlayers.PlayerOne;
+
+        if (player == EnumPlayers.PlayerOne) playerEnemy = EnumPlayers.PlayerTwo;
+        else if (player == EnumPlayers.PlayerTwo) playerEnemy = EnumPlayers.PlayerOne;
 
         // Вниз-вправо
-        FormulaAllDiagonalCells(diagonalWhichEnemy, diagonalCells, x, y, cell, "downright");
+        FormulaDamkaDiagonalCells(diagonalWhichEnemy, diagonalCells, x, y, cell, "downright", playerEnemy, player);
         diagonalWhichEnemy = false;
 
         // Вверх-вправо
-        FormulaAllDiagonalCells(diagonalWhichEnemy, diagonalCells, x, y, cell, "upright");
+        FormulaDamkaDiagonalCells(diagonalWhichEnemy, diagonalCells, x, y, cell, "upright", playerEnemy, player);
         diagonalWhichEnemy = false;
 
         // Вверх-влево
-        FormulaAllDiagonalCells(diagonalWhichEnemy, diagonalCells, x, y, cell, "upleft");
+        FormulaDamkaDiagonalCells(diagonalWhichEnemy, diagonalCells, x, y, cell, "upleft", playerEnemy, player);
         diagonalWhichEnemy = false;
 
         // Вниз-влево
-        FormulaAllDiagonalCells(diagonalWhichEnemy, diagonalCells, x, y, cell, "downleft");
+        FormulaDamkaDiagonalCells(diagonalWhichEnemy, diagonalCells, x, y, cell, "downleft", playerEnemy, player);
         diagonalWhichEnemy = false;
 
         return diagonalCells;
@@ -597,7 +638,7 @@ public class C_Battlefield : MonoBehaviour
     /// <param name="targetCell">Клетка, которую выбрали для хода.</param>
     /// <param name="allCells">Массив, содержащий все игровые клетки.</param>
     /// <returns></returns>
-    private List<C_Cell> FindAllDiagonalEnemyCells(C_Cell targetCell, C_Cell[,] allCells)
+    private List<C_Cell> FindDamkaDiagonalEnemyCells(C_Cell targetCell, C_Cell[,] allCells)
     {
         _availableEmemyCells = new List<C_Cell>();
         bool diagonalWhichEnemy = false;
@@ -607,28 +648,33 @@ public class C_Battlefield : MonoBehaviour
         int y = targetCell.GetY;
         C_Cell cell = null;
         C_Unit unit = null;
+        EnumPlayers player = targetCell.CurrentUnit.Player;
+        EnumPlayers playerEnemy = EnumPlayers.PlayerOne;
+
+        if (player == EnumPlayers.PlayerOne) playerEnemy = EnumPlayers.PlayerTwo;
+        else if (player == EnumPlayers.PlayerTwo) playerEnemy = EnumPlayers.PlayerOne;
 
         // Вниз-вправо
-        FormulaAllDiagonalEnemyCells(diagonalWhichEnemy, diagonalAttackCells, x, y, cell, unit, "downright");
+        FormulaDamkaDiagonalEnemyCells(diagonalWhichEnemy, diagonalAttackCells, x, y, cell, unit, "downright", playerEnemy, player);
         diagonalWhichEnemy = false;
 
         // Вверх-вправо
-        FormulaAllDiagonalEnemyCells(diagonalWhichEnemy, diagonalAttackCells, x, y, cell, unit, "upright");
+        FormulaDamkaDiagonalEnemyCells(diagonalWhichEnemy, diagonalAttackCells, x, y, cell, unit, "upright", playerEnemy, player);
         diagonalWhichEnemy = false;
 
         // Вверх-влево
-        FormulaAllDiagonalEnemyCells(diagonalWhichEnemy, diagonalAttackCells, x, y, cell, unit, "upleft");
+        FormulaDamkaDiagonalEnemyCells(diagonalWhichEnemy, diagonalAttackCells, x, y, cell, unit, "upleft", playerEnemy, player);
         diagonalWhichEnemy = false;
 
         // Вниз-влево
-        FormulaAllDiagonalEnemyCells(diagonalWhichEnemy, diagonalAttackCells, x, y, cell, unit, "downleft");
+        FormulaDamkaDiagonalEnemyCells(diagonalWhichEnemy, diagonalAttackCells, x, y, cell, unit, "downleft", playerEnemy, player);
         diagonalWhichEnemy = false;
 
         return diagonalAttackCells;
     }
 
-    private void FormulaAllDiagonalCells(bool diagonalWhichEnemy, List<C_Cell> diagonalCells,
-    int x, int y, C_Cell cell, string direction)
+    private void FormulaDamkaDiagonalCells(bool diagonalWhichEnemy, List<C_Cell> diagonalCells,
+    int x, int y, C_Cell cell, string direction, EnumPlayers playerEnemy, EnumPlayers player)
     {
         int formula = 0;
         int directionX = 1;
@@ -672,9 +718,9 @@ public class C_Battlefield : MonoBehaviour
             cell = _allCells[currentX, currentY];
 
             // если на клетке дружественный персонаж
-            if (cell.CurrentUnit && !cell.CurrentUnit.IsEnemy) break;
+            if (cell.CurrentUnit && cell.CurrentUnit.Player == player) break;
             // если на клетке есть персонаж и он вражеский
-            else if (cell.CurrentUnit && cell.CurrentUnit.IsEnemy && diagonalWhichEnemy == false)
+            else if (cell.CurrentUnit && cell.CurrentUnit.Player == playerEnemy && diagonalWhichEnemy == false)
             {
                 // добавляем клетку в массив, где храняться клетки с вражеским персонажем
                 _availableEmemyCells.Add(cell);
@@ -701,7 +747,7 @@ public class C_Battlefield : MonoBehaviour
             else if (diagonalWhichEnemy == true && !_availableAttackCells.Contains(cell))
             {
                 // если за клеткой вражеского персонажа есть другие свободные клетки
-                if (!cell.CurrentUnit)
+                if (!cell.CurrentUnit && _setting.IsLimitedMoveDamka == false)
                 {
                     _availableAttackCells.Add(cell);
                     Debug.Log($"Найдена ДОП диагональная клетка {cell} за вражеским персонажем.!");
@@ -721,8 +767,8 @@ public class C_Battlefield : MonoBehaviour
         }
     }
 
-    private void FormulaAllDiagonalEnemyCells(bool diagonalWhichEnemy, List<C_Cell> diagonalAttackCells,
-        int x, int y, C_Cell cell, C_Unit unit, string direction)
+    private void FormulaDamkaDiagonalEnemyCells(bool diagonalWhichEnemy, List<C_Cell> diagonalAttackCells,
+        int x, int y, C_Cell cell, C_Unit unit, string direction, EnumPlayers playerEnemy, EnumPlayers player)
     {
         int formula = 0;
         int directionX = 1;
@@ -767,9 +813,9 @@ public class C_Battlefield : MonoBehaviour
             unit = cell.CurrentUnit;
 
             // если на клетке дружественный персонаж
-            if (unit && !cell.CurrentUnit.IsEnemy) break;
+            if (unit && cell.CurrentUnit.Player == player) break;
             // если на клетке есть персонаж и он вражеский
-            else if (unit && cell.CurrentUnit.IsEnemy && diagonalWhichEnemy == false)
+            else if (unit && cell.CurrentUnit.Player == playerEnemy && diagonalWhichEnemy == false)
             {
                 // добавляем клетку в массив, где храняться клетки с вражеским персонажем
                 _availableEmemyCells.Add(cell);
@@ -797,7 +843,7 @@ public class C_Battlefield : MonoBehaviour
             else if (diagonalWhichEnemy == true && !diagonalAttackCells.Contains(cell))
             {
                 // если за клеткой вражеского персонажа есть другие свободные клетки
-                if (!unit) diagonalAttackCells.Add(cell);
+                if (!unit && _setting.IsLimitedMoveDamka == false) diagonalAttackCells.Add(cell);
                 else break;
             }
         }
@@ -861,7 +907,7 @@ public class C_Battlefield : MonoBehaviour
                 }
             }
 
-            //if (_availableAttackCells.Count > 0) return;
+            //if (_availableAttackCells.Count > 0)
         }
 
         if (_availableCells != null)
@@ -870,6 +916,38 @@ public class C_Battlefield : MonoBehaviour
             {
                 targetCell.RenderEnter.enabled = vision;
                 if (vision) targetCell.OldMaterial = targetCell.ShowEnterMaterial;
+            }
+        }
+    }
+
+    private void VisibleAvailableUnit(bool vision)
+    {
+        foreach (var cell in _allCells)
+        {
+            if (!cell.CurrentUnit) continue;
+
+            if (cell.CurrentUnit.IsEnemy) continue;
+
+            bool attack = cell.CurrentUnit.AvailableAttackCells.Count > 0;
+            bool move = cell.CurrentUnit.AvailableCells.Count > 0;
+
+            if (move || attack)
+            {
+                if (vision)
+                {
+                    cell.CurrentUnit.MeshRendererCloth.material = cell.CurrentUnit.IlluminatedAvailableMaterialCloth;
+                    cell.CurrentUnit.IsIlluminated = true;
+                    //Debug.Log($"Доступный для хода юнит {cell.CurrentUnit} подчеркнут.");
+                }
+                else
+                {
+                    if (cell.CurrentUnit.IsIlluminated == true)
+                    {
+                        cell.CurrentUnit.IsIlluminated = false;
+                        cell.CurrentUnit.MeshRendererCloth.material = cell.CurrentUnit.OldMaterialCloth;
+                        //Debug.Log($"Доступный для хода подчеркнутый юнит {cell.CurrentUnit} вернул свой окрас.");
+                    }
+                }
             }
         }
     }
@@ -943,7 +1021,7 @@ public class C_Battlefield : MonoBehaviour
 
                 if (_unitEnter != null)
                 {
-                    ProccesEnter(_unitEnter);
+                    ProccesUnitEnter(_unitEnter);
                     _unitEnter = null;
                 }
             }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using Zenject;
@@ -27,19 +28,22 @@ public class C_Unit : MonoBehaviour, IUnitMain, IUnitVoice, IPointerEnterHandler
     private MeshRenderer _meshRendererCloth;
     private Material _oldMaterialCloth;
     private Material _enterMaterialCloth;
-    private Material _dontEnterMaterialCloth;
+    private Material _illuminatedAvailableMaterialCloth;
     private bool _isEnemy = false;
     private bool _damka = false;
     private bool _death = false;
 
     public C_Cell Cell { get => _currentCell; set => _currentCell = value; }
+    public List<C_Cell> AvailableCells { get; set; }
+    public List<C_Cell> AvailableAttackCells { get; set; }
     public MeshRenderer MeshRendererCloth { get => _meshRendererCloth; set => _meshRendererCloth = value; }
     public bool IsEnemy { get => _isEnemy; set => _isEnemy = value; }
     public bool IsDamka { get => _damka; set => _damka = value; }
+    public bool IsIlluminated { get; set; }
 
     public Material OldMaterialCloth => _oldMaterialCloth;
     public Material EnterMaterialCloth => _enterMaterialCloth;
-    public Material DontEnterMaterialCloth => _dontEnterMaterialCloth;
+    public Material IlluminatedAvailableMaterialCloth => _illuminatedAvailableMaterialCloth;
 
     public EnumPlayers Player { get => _player; set => _player = value; }
 
@@ -103,7 +107,7 @@ public class C_Unit : MonoBehaviour, IUnitMain, IUnitVoice, IPointerEnterHandler
         else _oldMaterialCloth = _meshRendererCloth.material = _colorPlayersManager.MaterialPlayerTwo;
 
         _enterMaterialCloth = _materialContainer.MaterialUnitEnter;
-        _dontEnterMaterialCloth = _materialContainer.MaterialUnitShow;
+        _illuminatedAvailableMaterialCloth = _materialContainer.MaterialUnitilluminatedAvailable;
     }
 
     public void OnPointerEnter(PointerEventData eventData)

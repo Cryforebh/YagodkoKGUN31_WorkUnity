@@ -15,6 +15,7 @@ public class C_MaterialsContainer : MonoBehaviour
     [Header("Материалы для выбора Юнита:")]
     [SerializeField] private Material _materialUnitShow;
     [SerializeField] private Material _materialUnitEnter;
+    [SerializeField] private Material _materialUnitilluminatedAvailable;
 
     [Header("Материалы игроков:")]
     [SerializeField] private Material _materialPlayerOne;
@@ -27,6 +28,7 @@ public class C_MaterialsContainer : MonoBehaviour
 
     public Material MaterialUnitShow => _materialUnitShow;
     public Material MaterialUnitEnter => _materialUnitEnter;
+    public Material MaterialUnitilluminatedAvailable => _materialUnitilluminatedAvailable;
 
     public Material PlayerOne => _materialPlayerOne;
     public Material PlayerTwo => _materialPlayerTwo;

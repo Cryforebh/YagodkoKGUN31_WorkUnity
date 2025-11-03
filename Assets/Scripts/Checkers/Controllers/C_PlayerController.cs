@@ -34,8 +34,8 @@ public class C_PlayerController : MonoBehaviour
                 break;
             case EnumGameEvent.EndMove:
                 Debug.Log("Сигнал EndMove сработал");
-                _playerManager.CheckWinner();
                 _playerManager.ChangePlayer();
+                _playerManager.CheckWinner();
                 break;
             default:
                 break;

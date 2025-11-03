@@ -31,7 +31,7 @@ public class TurnVisualPlayers : MonoBehaviour
 
     private void Start()
     {
-        _playerManager.OnActivePlayerChanged += ShowStartGame;
+        _playerManager.OnActivePlayerChanged += ShowTurn;
         _localizationManager.ChangeLanguageEvent += ChangeLanguageUpdateText;
         _colorContainer.ColorChangedEvent += ChangedUpdateColor;
 
@@ -117,11 +117,13 @@ public class TurnVisualPlayers : MonoBehaviour
         UpdateTextWinInfo(_textPlayerTwo);
     }
 
-    public void ShowStartGame(EnumPlayers players)
+    public void ShowTurn(EnumPlayers players)
     {
         if (_playerManager.GetPlayersWhithUnits().Count < 2) return;
 
         ResetEnable();
+
+        if (_playerManager.Win || _playerManager.Draw) return;
 
         switch (players)
         {
@@ -165,7 +167,7 @@ public class TurnVisualPlayers : MonoBehaviour
     {
         if (_currentCoroutine != null) StopCoroutine(_currentCoroutine);
 
-        _playerManager.OnActivePlayerChanged -= ShowStartGame;
+        _playerManager.OnActivePlayerChanged -= ShowTurn;
         _localizationManager.ChangeLanguageEvent -= ChangeLanguageUpdateText;
         _colorContainer.ColorChangedEvent -= ChangedUpdateColor;
     }
